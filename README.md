@@ -1,3 +1,4 @@
+A clone of the Pinterest application with an added To-do feature to organize your tasks and ideas
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
