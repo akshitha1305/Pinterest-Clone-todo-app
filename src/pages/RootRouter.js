@@ -5,6 +5,11 @@ import Header from '../Components/Header';
 import Home from './Home';
 import Signup from './Signup';
 import Login from './Login';
+import ForgotPassword from './ForgotPassword';
+import ResetPassword from './ResetPassword';
+import ForgotPassword from './ForgotPassword';
+import ResetPassword from './ResetPassword';
+
 
 const hiddenPaths = ['/login', '/signup'];
 
@@ -43,6 +48,9 @@ function App() {
           <Routes>
             <Route path='/signup' element={<Signup />} />
             <Route path='/login' element={<Login />} />
+            <Route path="/forgot-password" component={ForgotPassword} />
+            <Route path="/reset-password/:token" component={ResetPassword} />
+
             <Route path='/' element={<Home />} />
           </Routes>
         </div>
