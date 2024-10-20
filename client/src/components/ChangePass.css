@@ -1,0 +1,21 @@
+/* Center the form */
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 15vh; /* Full-screen height */
+  }
+  
+  .change-pass-form {
+    width: 500px; /* Make the form smaller */
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form__btn--submit:hover {
+    background-color: #0056b3;
+  }
+  

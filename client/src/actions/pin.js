@@ -74,3 +74,17 @@ export const deleteSavedPin =
     });
   };
 
+  // actions/pin.js
+  export const updatePassword = ({ userId, currentPassword, newPassword }) => async (dispatch) => {
+    try {
+      // Call your API to update the password
+      const response = await userService.updateUserPassword(userId, currentPassword, newPassword);
+  
+      // Handle success (you may want to dispatch some action for updating the session)
+      return response;
+    } catch (error) {
+      // Handle error
+      throw error;
+    }
+  };
+  

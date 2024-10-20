@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
 
-import GitHubIcon from "@mui/icons-material/GitHub";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import PinterestIcon from "@mui/icons-material/Pinterest";
 import { Outlet, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
