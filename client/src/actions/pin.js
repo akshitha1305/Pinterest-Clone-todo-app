@@ -54,6 +54,16 @@ export const getRandomPins = () => async (dispatch) => {
   });
 };
 
+export const deleteSavedPin =
+  ({ userId, photoUrl }) =>
+  async (dispatch) => {
+    await userService.deleteSavedPin({ userId, photoUrl });
+    dispatch({
+      type: DELETE_SAVED_PIN,
+      photoUrl: photoUrl,
+    });
+  };
+
 export const savePin =
   ({ userId, photoUrl }) =>
   async (dispatch) => {
@@ -64,15 +74,6 @@ export const savePin =
     });
   };
 
-export const deleteSavedPin =
-  ({ userId, photoUrl }) =>
-  async (dispatch) => {
-    await userService.deleteSavedPin({ userId, photoUrl });
-    dispatch({
-      type: DELETE_SAVED_PIN,
-      photoUrl: photoUrl,
-    });
-  };
 
   // actions/pin.js
   export const updatePassword = ({ userId, currentPassword, newPassword }) => async (dispatch) => {
@@ -88,3 +89,27 @@ export const deleteSavedPin =
     }
   };
   
+  // New action for creating a custom Pinterest pin
+export const createPin =
+({ userId, title, imageUrl }) =>
+  async (dispatch) => {
+
+    try {
+     
+      const response = await userService.createPin({
+        userId,
+        title,
+        imageUrl
+      });
+
+      // Dispatch the CREATE_CUSTOM_PIN action to update the state
+      dispatch({
+        type: CREATE_CUSTOM_PIN,
+        pin: response.data, // Assuming the API returns the created pin object
+      });
+
+      return response.data; // Return the created pin data for further use if needed
+    } catch (error) {
+      throw error; // Handle error if any
+    }
+  };
