@@ -156,6 +156,27 @@ usersRouter.put(
   }
 );
 
+// Like pin
+usersRouter.put(
+  "/:id/like-pin",
+  passport.authenticate("jwt", { session: false }),
+  async (request, response) => {
+    try {
+      const user = await User.findByIdAndUpdate(
+        request.params.id,
+        { $addToSet: { likedPins: request.body.photoUrl } },
+        { new: true }
+      );
+      return response.json(user);
+    } catch (exception) {
+      return response
+        .status(500)
+        .json({ error: "A database error has occurred" });
+    }
+  }
+);
+
+
 usersRouter.put(
   "/:id/delete-pin",
   passport.authenticate("jwt", { session: false }),
@@ -164,6 +185,26 @@ usersRouter.put(
       const user = await User.findByIdAndUpdate(
         request.params.id,
         { $pull: { savedPins: request.body.photoUrl } },
+        { new: true }
+      );
+      return response.json(user);
+    } catch (exception) {
+      return response
+        .status(500)
+        .json({ error: "A database error has occurred" });
+    }
+  }
+);
+
+// Unlike a pin
+usersRouter.put(
+  "/:id/unlike-pin",
+  passport.authenticate("jwt", { session: false }),
+  async (request, response) => {
+    try {
+      const user = await User.findByIdAndUpdate(
+        request.params.id,
+        { $pull: { likedPins: request.body.photoUrl } },
         { new: true }
       );
       return response.json(user);
