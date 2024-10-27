@@ -49,12 +49,142 @@ const SaveButton = styled("button")`
   }
 `;
 
-const Pin = ({ userId, photoUrl, isSaved }) => {
+const LikeButton = styled("button")`
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: ${props => (props.isLiked ? "#ff4757" : "#fff")}; /* Red when liked */
+  color: ${props => (props.isLiked ? "#fff" : "#111")}; /* White text if liked */
+  border: none;
+  border-radius: 24px;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: ${props => (props.isLiked ? "#e84141" : "#f0f0f0")}; /* Darker red on hover if liked */
+  }
+`;
+
+const IconButton = styled("button")`
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 24px;
+  border: none;
+  padding: 8px;
+  margin: 0 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+
+  // &:hover {
+  //   background-color: #f0f0f0;
+  // }
+
+   &:hover {
+    background-color: ${props => (props.isLiked ? "#e84141" : "#f0f0f0")}; /* Darker red on hover if liked */
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+`;
+
+const MoreMenu = styled("div")`
+  position: absolute;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+  top: 30px;
+  right: 0;
+  width: 220px;
+  display: ${({ open }) => (open ? "block" : "none")};
+  z-index: 999;
+`;
+
+const MenuItem = styled("div")`
+  padding: 8px 16px;
+  cursor: pointer;
+  &:hover {
+    background-color: #f5f5f5;
+  }
+`;
+
+const UsernameContainer = styled("div")`
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  color: white;  /* White text to contrast with the image */
+`;
+
+const FollowButton = styled("button")`
+  background-color: #0073e6;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #005bb5;
+  }
+`;
+
+const Pin = ({ userId, username, pin_owner_id, title, photoUrl, isSaved, isLiked }) => {
+  const dispatch = useDispatch();
   const [openDialog, setOpenDialog] = useState(false);
+  const [showButton, setShowButton] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // State for following
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  // Fetch whether the logged-in user is following the pin owner
+  useEffect(() => {
+    const fetchFollowStatus = async () => {
+      try {
+        const isFollowingResponse = await checkIfFollowing(pin_owner_id);
+        setIsFollowing(isFollowingResponse);
+      } catch (error) {
+        console.error("Failed to check follow status:", error);
+      }
+    };
+
+    fetchFollowStatus();
+  }, [pin_owner_id]);
+
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
 
-  const [showButton, setShowButton] = useState(false);
+  // Save pin logic
+  const handleOnClick = (event) => {
+    event.preventDefault();
+    isSaved
+      ? dispatch(deleteSavedPin({ userId, photoUrl }))
+      : dispatch(savePin({ userId, photoUrl }));
+  };
+
+  // Like/Unlike logic
+  const handleLike = (event) => {
+    event.preventDefault();
+    if (isLiked) {
+      dispatch(unlikePin({ userId, photoUrl }));
+    } else {
+      dispatch(likePin({ userId, photoUrl }));
+    }
+  };
+
 
     // Download Pin using blob
     const handleDownload = async () => {
@@ -73,8 +203,7 @@ const Pin = ({ userId, photoUrl, isSaved }) => {
     };
 
   return (
-    <div>
-      <div className="pin__wrapper">
+    <div className="pin__wrapper">
         <div
           className="pin__container"
           onMouseOver={() => setShowButton(true)}
@@ -84,11 +213,19 @@ const Pin = ({ userId, photoUrl, isSaved }) => {
           <div onClick={handleOpenDialog}>
             <img src={`${photoUrl}&w=236`} alt="" />
           </div>
+
+          {/* Show the Save button only on hover */}
           {showButton && (
-            <SaveButton userId={userId} photoUrl={photoUrl} isSaved={isSaved} />
-          )}
-        </div>
+            <SaveButton
+            onClick={handleOnClick}
+            isSaved={isSaved}
+          >
+            {isSaved ? "Saved" : "Save"}
+          </SaveButton>
+        )}
       </div>
+
+      {/* Modal Content */}
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
@@ -107,7 +244,16 @@ const Pin = ({ userId, photoUrl, isSaved }) => {
             >
               {isSaved ? "Saved" : "Save"}
              
-            </SaveButton>   
+            </SaveButton> 
+  
+            {/* Like button in top-left corner of modal image */}
+            <LikeButton
+              onClick={handleLike}
+              isLiked={isLiked} // Change to lowercase
+              // style={{ position: "absolute", top: "10px", right: "10px" }}
+            >
+              {isLiked ? "Liked" : "Like"}
+            </LikeButton>
 
              {/* Action Buttons */}
              <div className="icon-buttons__container" style={{ position: "absolute", bottom: "10px", right: "10px", display: "flex" }}>
