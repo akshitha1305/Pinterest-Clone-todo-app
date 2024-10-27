@@ -122,12 +122,13 @@ const Profile = () => {
     dispatch(getFollowers(userId)); // Fetch followers
     dispatch(getFollowing(userId)); // Fetch following
   }, [dispatch, userId]);
+  
   useEffect(() => {
     // Update local state when following changes in Redux
     setLocalFollowing(following);
   }, [following]);
 
-  const { feed, saved } = useSelector((state) => state.pin);
+  const {saved } = useSelector((state) => state.pin);
 
 
   // Function to handle unfollow
@@ -152,8 +153,8 @@ const Profile = () => {
         onFollowersClick={() => setFollowersModalOpen(true)}
         onFollowingClick={() => setFollowingModalOpen(true)}
       />
-      {feed.length
-        ? <PinGrid userId={userId} photoUrls={feed} savedPins={saved} />
+      {saved.length
+        ? <PinGrid userId={userId} photoUrls={saved} savedPins={saved} />
         : <h3>No pins saved yet</h3>
       }
        {/* Followers Modal */}
