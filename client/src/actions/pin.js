@@ -9,6 +9,11 @@ export const UNLIKE_PIN = "UNLIKE_PIN";
 export const DELETE_SAVED_PIN = "DELETE_SAVED_PIN";
 export const CREATE_CUSTOM_PIN = "CREATE_CUSTOM_PIN";
 
+// Action types
+export const SET_FOLLOWERS = "SET_FOLLOWERS";
+export const SET_FOLLOWING = "SET_FOLLOWING";
+
+
 export const getSavedPins =
   ({ userId, setAsFeed }) =>
   async (dispatch) => {

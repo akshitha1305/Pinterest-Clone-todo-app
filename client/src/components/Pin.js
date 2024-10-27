@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-
 import ModalUnstyled from "@mui/core/ModalUnstyled";
 import { styled } from "@mui/system";
 import { useDispatch } from "react-redux";
-
 import "./Pin.css";
 import { savePin, deleteSavedPin } from "../actions/pin";
+import { followUser, unfollowUser, checkIfFollowing } from '../services/users';
 
 const Dialog = styled(ModalUnstyled)`
   position: fixed;
@@ -201,6 +200,30 @@ const Pin = ({ userId, username, pin_owner_id, title, photoUrl, isSaved, isLiked
         console.error("Failed to download image", error);
       }
     };
+// Function to handle follow/unfollow
+const handleFollow = async () => {
+  try {
+    if (isFollowing) {
+      // Call the unfollow API if the user is currently being followed
+      await unfollowUser(pin_owner_id);
+    } else {
+      // Call the follow API if the user is not being followed yet
+      await followUser(pin_owner_id);
+    }
+    setIsFollowing(!isFollowing); // Toggle follow state
+  } catch (error) {
+    console.error('Failed to follow/unfollow user:', error);
+  }
+};
+
+
+
+
+
+
+
+
+
 
   return (
     <div className="pin__wrapper">
@@ -211,9 +234,8 @@ const Pin = ({ userId, username, pin_owner_id, title, photoUrl, isSaved, isLiked
           title={title} 
         >
           <div onClick={handleOpenDialog}>
-            <img src={`${photoUrl}&w=236`} alt="" />
+            <img src={`${photoUrl}&w=236`}  alt={title} />
           </div>
-
           {/* Show the Save button only on hover */}
           {showButton && (
             <SaveButton
@@ -271,6 +293,12 @@ const Pin = ({ userId, username, pin_owner_id, title, photoUrl, isSaved, isLiked
               </MoreMenu>
             </div>
 
+           {/* Username and Follow Button at Bottom-Left inside modal */}
+           <UsernameContainer>
+              <strong>{username}</strong>
+              <FollowButton onClick={handleFollow}> {isFollowing ? 'Unfollow' : 'Follow'}</FollowButton>
+            </UsernameContainer>
+            
             </div>  
         </div>
       </Dialog>
