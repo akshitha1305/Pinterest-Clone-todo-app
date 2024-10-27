@@ -109,20 +109,103 @@ const Profile = () => {
   const user = useSelector((state) => state.session.user);
   const userId = user.id;
 
+
+  const [localFollowing, setLocalFollowing] = useState([]);
+
+  const { followers = [], following = [] } = useSelector((state) => state.pin); // Default to empty arrays
+
+  const [isFollowersModalOpen, setFollowersModalOpen] = useState(false);
+  const [isFollowingModalOpen, setFollowingModalOpen] = useState(false);
+
   useEffect(() => {
     dispatch(getSavedPins({ userId, setAsFeed: true }));
+    dispatch(getFollowers(userId)); // Fetch followers
+    dispatch(getFollowing(userId)); // Fetch following
   }, [dispatch, userId]);
+  useEffect(() => {
+    // Update local state when following changes in Redux
+    setLocalFollowing(following);
+  }, [following]);
 
   const { feed, saved } = useSelector((state) => state.pin);
+
+
+  // Function to handle unfollow
+  const handleUnfollow = async (followedUserId) => {
+    try {
+      // Call the unfollow API
+      await unfollowUser(followedUserId);
+
+      // Update the local state to remove the unfollowed user from the UI
+      setLocalFollowing(localFollowing.filter(user => user.id !== followedUserId));
+    } catch (error) {
+      console.error('Failed to unfollow user:', error);
+    }
+  };
 
   return (
     <div>
       <NavBar />
-      <ProfileHeader user={user} />
+      <ProfileHeader  user={user}
+        followersCount={followers.length}  // Now followers will always be an array
+        followingCount={localFollowing.length}  // Use local state for following count
+        onFollowersClick={() => setFollowersModalOpen(true)}
+        onFollowingClick={() => setFollowingModalOpen(true)}
+      />
       {feed.length
         ? <PinGrid userId={userId} photoUrls={feed} savedPins={saved} />
         : <h3>No pins saved yet</h3>
       }
+       {/* Followers Modal */}
+       <Dialog
+        open={isFollowersModalOpen}
+        onClose={() => setFollowersModalOpen(false)}
+        BackdropComponent={Backdrop}
+      >
+        <ModalContent>
+          <ModalHeader>
+            <ModalTitle>Followers</ModalTitle>
+            <CloseButton onClick={() => setFollowersModalOpen(false)}>×</CloseButton>
+          </ModalHeader>
+          <UserList>
+            {followers.map((follower) => (
+              <UserListItem key={follower.id}>
+                <UserInfo>
+                  <UserAvatar src="https://img.freepik.com/premium-vector/collection-hand-drawn-profile-icons_1323905-5.jpg?w=740" />
+                  <UserName>{follower.username}</UserName>
+                </UserInfo>
+              </UserListItem>
+            ))}
+          </UserList>
+        </ModalContent>
+      </Dialog>
+
+      {/* Following Modal */}
+      <Dialog
+        open={isFollowingModalOpen}
+        onClose={() => setFollowingModalOpen(false)}
+        BackdropComponent={Backdrop}
+      >
+        <ModalContent>
+          <ModalHeader>
+            <ModalTitle>Following</ModalTitle>
+            <CloseButton onClick={() => setFollowingModalOpen(false)}>×</CloseButton>
+          </ModalHeader>
+          <UserList>
+            {localFollowing.map((followedUser) => (
+              <UserListItem key={followedUser.id}>
+                <UserInfo>
+                  <UserAvatar src="https://img.freepik.com/premium-vector/flat-avatar-icon-png-transparent-vector-layer-illustration_1226483-1824.jpg?w=740" />
+                  <UserName>{followedUser.username}</UserName>
+                </UserInfo>
+                <UnfollowButton onClick={() => handleUnfollow(followedUser.id)}>
+                  Unfollow
+                </UnfollowButton>
+              </UserListItem>
+            ))}
+          </UserList>
+        </ModalContent>
+      </Dialog>
     </div>
   );
 };
