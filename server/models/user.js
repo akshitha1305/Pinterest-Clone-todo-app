@@ -18,6 +18,9 @@ const userSchema = new mongoose.Schema({
   savedPins: {
     type: [String],
   },
+  likedPins: {
+    type: [String],
+  },
 });
 
 userSchema.plugin(uniqueValidator);
