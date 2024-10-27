@@ -9,6 +9,13 @@ export const signup = async (userData) => {
 };
 
 export const login = async (userData) => {
+  const response = await instance.post("/login", userData);
+  console.log('response is:', response);
+  const { token, user } = response.data;
+
+  console.log('data is:', response.data.userId);
+
+  localStorage.setItem('userId', response.data.userId);
   return await instance.post("/login", userData);
 };
 export const forgot = async (userData) => {
@@ -25,10 +32,6 @@ export const getProfile = async (userId) => {
 
 export const savePin = async ({ userId, photoUrl }) => {
   return await instance.put(`/${userId}/save-pin`, { photoUrl });
-};
-
-export const deleteSavedPin = async ({ userId, photoUrl }) => {
-  return await instance.put(`/${userId}/delete-pin`, { photoUrl });
 };
 
 export const likePin = async ({ userId, photoUrl }) => {
