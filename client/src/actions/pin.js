@@ -4,6 +4,8 @@ import * as userService from "../services/users";
 export const FETCH_SAVED_PINS = "FETCH_SAVED_PINS";
 export const SET_FEED = "SET_FEED";
 export const SAVE_PIN = "SAVE_PIN";
+export const LIKE_PIN = "LIKE_PIN";
+export const UNLIKE_PIN = "UNLIKE_PIN";
 export const DELETE_SAVED_PIN = "DELETE_SAVED_PIN";
 export const CREATE_CUSTOM_PIN = "CREATE_CUSTOM_PIN";
 
@@ -23,6 +25,30 @@ export const getSavedPins =
     }
   };
 
+export const likePin = ({ userId, photoUrl }) => async (dispatch) => {
+  try {
+    await userService.likePin({ userId, photoUrl });
+    dispatch({
+      type: LIKE_PIN,
+      photoUrl: photoUrl,
+    });
+  } catch (error) {
+    console.error("Error liking pin:", error);
+  }
+};
+
+export const unlikePin = ({ userId, photoUrl }) => async (dispatch) => {
+  try {
+    await userService.unlikePin({ userId, photoUrl });
+    dispatch({
+      type: UNLIKE_PIN,
+      photoUrl: photoUrl,
+    });
+  } catch (error) {
+    console.error("Error unliking pin:", error);
+  }
+};
+
 export const searchPins = (query) => async (dispatch) => {
   const response = await unsplashService.search({ query, per_page: 30 });
   const photoUrls = response.data.results.map((photo) => photo.urls.raw);
@@ -32,37 +58,24 @@ export const searchPins = (query) => async (dispatch) => {
   });
 };
 
-// export const createCustomPin = ({ userId, photoUrl, title, description }) => async (dispatch) => {
-//   try {
-//     const response = await userService.createCustomPin({ userId, photoUrl, title, description });
-//     dispatch({
-//       type: CREATE_CUSTOM_PIN,
-//       pin: response.data, // This should include at least { photoUrl, title, description }
-//     });
-//   } catch (error) {
-//     console.error("Error creating custom pin:", error);
-//     // You might want to dispatch an error action here
-//   }
-// };
-
 export const getRandomPins = () => async (dispatch) => {
-  const response = await unsplashService.random({ count: 50 });
-  const photoUrls = response.data.map((photo) => photo.urls.raw);
-  dispatch({
-    type: SET_FEED,
-    photoUrls: photoUrls,
-  });
-};
+  try {
+    // Fetch random pins from MongoDB
+    const response = await userService.getRandomPins();
+    console.log('Fetched Pins:', response.data); 
 
-export const deleteSavedPin =
-  ({ userId, photoUrl }) =>
-  async (dispatch) => {
-    await userService.deleteSavedPin({ userId, photoUrl });
+    const pins = response.data;
+
+    const photoUrls = response.data.map((pin) => pin.imageUrl);
+
     dispatch({
-      type: DELETE_SAVED_PIN,
-      photoUrl: photoUrl,
+      type: SET_FEED,
+      //photoUrls: photoUrls,
+      pins: pins,
     });
-  };
+  } catch (error) {
+  }
+};
 
 export const savePin =
   ({ userId, photoUrl }) =>
@@ -75,41 +88,65 @@ export const savePin =
   };
 
 
-  // actions/pin.js
-  export const updatePassword = ({ userId, currentPassword, newPassword }) => async (dispatch) => {
-    try {
-      // Call your API to update the password
-      const response = await userService.updateUserPassword(userId, currentPassword, newPassword);
-  
-      // Handle success (you may want to dispatch some action for updating the session)
-      return response;
-    } catch (error) {
-      // Handle error
-      throw error;
-    }
-  };
-  
-  // New action for creating a custom Pinterest pin
-export const createPin =
-({ userId, title, imageUrl }) =>
-  async (dispatch) => {
-
-    try {
-     
-      const response = await userService.createPin({
-        userId,
-        title,
-        imageUrl
-      });
-
-      // Dispatch the CREATE_CUSTOM_PIN action to update the state
+export const deleteSavedPin =
+  ({ userId, photoUrl }) =>
+    async (dispatch) => {
+      await userService.deleteSavedPin({ userId, photoUrl });
       dispatch({
-        type: CREATE_CUSTOM_PIN,
-        pin: response.data, // Assuming the API returns the created pin object
+        type: DELETE_SAVED_PIN,
+        photoUrl: photoUrl,
       });
+    };
 
-      return response.data; // Return the created pin data for further use if needed
-    } catch (error) {
-      throw error; // Handle error if any
-    }
-  };
+// Action to update password (already exists in your code)
+export const updatePassword = ({ userId, currentPassword, newPassword }) => async (dispatch) => {
+  try {
+    const response = await userService.updateUserPassword(userId, currentPassword, newPassword);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// New action for creating a custom Pinterest pin
+export const createPin =
+  ({ userId, title, imageUrl }) =>
+    async (dispatch) => {
+
+      try {
+       
+        const response = await userService.createPin({
+          userId,
+          title,
+          imageUrl
+        });
+
+        // Dispatch the CREATE_CUSTOM_PIN action to update the state
+        dispatch({
+          type: CREATE_CUSTOM_PIN,
+          pin: response.data, // Assuming the API returns the created pin object
+        });
+
+        return response.data; // Return the created pin data for further use if needed
+      } catch (error) {
+        throw error; // Handle error if any
+      }
+    };
+
+// Fetch followers for a user
+export const getFollowers = (userId) => async (dispatch) => {
+  const response = await userService.getFollowers(userId);
+  dispatch({
+    type: SET_FOLLOWERS,
+    followers: response.data,
+  });
+};
+
+// Fetch users the logged-in user is following
+export const getFollowing = (userId) => async (dispatch) => {
+  const response = await userService.getFollowing(userId);
+  dispatch({
+    type: SET_FOLLOWING,
+    following: response.data,
+  });
+};
