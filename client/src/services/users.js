@@ -11,6 +11,13 @@ export const signup = async (userData) => {
 export const login = async (userData) => {
   return await instance.post("/login", userData);
 };
+export const forgot = async (userData) => {
+  return await instance.post("/forgot", userData);
+};
+
+export const updateUserPassword = async (userId, currentPassword, newPassword) => {
+  return await instance.put(`/update-password`, { userId, currentPassword, newPassword });
+};
 
 export const getProfile = async (userId) => {
   return await instance.get(`/${userId}`);
@@ -22,6 +29,31 @@ export const savePin = async ({ userId, photoUrl }) => {
 
 export const deleteSavedPin = async ({ userId, photoUrl }) => {
   return await instance.put(`/${userId}/delete-pin`, { photoUrl });
+};
+
+export const likePin = async ({ userId, photoUrl }) => {
+  return await instance.put(`/${userId}/like-pin`, { photoUrl });
+};
+
+export const unlikePin = async ({ userId, photoUrl }) => {
+  return await instance.put(`/${userId}/unlike-pin`, { photoUrl });
+};
+
+export const deleteSavedPin = async ({ userId, photoUrl }) => {
+  return await instance.put(`/${userId}/delete-pin`, { photoUrl });
+};
+
+// Add a new API call for creating a custom pin
+export const createPin = async ({ userId, title, imageUrl }) => {
+  const user_id = localStorage.getItem('userId');
+  return await instance.post(`/${user_id}/create-pin`, {
+    title,
+    imageUrl
+  });
+};
+
+export const getRandomPins = async () => {
+  return await instance.get("/get/random-pins"); // Assuming you have an endpoint like /api/random-pins
 };
 
 // Follow / Unfollow
