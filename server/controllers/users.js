@@ -166,6 +166,26 @@ usersRouter.put(
   }
 );
 
+// Route to follow a user
+usersRouter.post('/follow/user', async (req, res) => {
+  const { userIdToFollow, loggedInUserId } = req.body; // userIdToFollow: user to follow, loggedInUserId: logged-in user
+
+  try {
+    // Update the followers list of the target user (userIdToFollow)
+    await User.findByIdAndUpdate(userIdToFollow, {
+      $addToSet: { followers: loggedInUserId } // Ensure no duplicates
+    });
+
+    // Update the following list of the logged-in user
+    await User.findByIdAndUpdate(loggedInUserId, {
+      $addToSet: { following: userIdToFollow } // Ensure no duplicates
+    });
+
+    res.status(200).json({ message: "User followed successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to follow user" });
+  }
+});
 
 // Route to unfollow a user
 usersRouter.post('/unfollow/user', async (req, res) => {
