@@ -46,7 +46,9 @@ const ProfileHeader = ({ user, followersCount, followingCount, onFollowersClick,
           </a>
         </div>
       </div>
-    
+      <Link to="/change-password">Change Password</Link>
+      <hr></hr>
+      <h2>My Saved Pins</h2>
     </div>
   );
 };

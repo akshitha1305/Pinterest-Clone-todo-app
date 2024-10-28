@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { getSavedPins, getRandomPins } from "../actions/pin";
+import { getSavedPins,getLikedPins, getRandomPins } from "../actions/pin";
 import NavBar from "../components/NavBar";
 import PinGrid from "../components/PinGrid";
 
@@ -11,17 +11,18 @@ const Home = () => {
   const user = useSelector((state) => state.session.user);
   const userId = user.id;
 
-  const { feed, saved } = useSelector((state) => state.pin);
+  const { feed, saved, liked} = useSelector((state) => state.pin);
 
   useEffect(() => {
     dispatch(getSavedPins({ userId, setAsFeed: false }));
+    dispatch(getLikedPins({ userId, setAsFeed: false }));
     dispatch(getRandomPins());
   }, [dispatch, userId]);
 
   return (
     <div>
       <NavBar />
-      <PinGrid userId={userId} photoUrls={feed} savedPins={saved} />
+      <PinGrid userId={userId} pins={feed} savedPins={saved}  likedPins={liked} />
     </div>
   );
 };

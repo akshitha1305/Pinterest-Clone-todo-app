@@ -3,14 +3,14 @@ import Masonry from "react-masonry-css";
 import "./PinGrid.css";
 import Pin from "./Pin";
 
-const PinGrid = ({ userId, photoUrls, savedPins = [] }) => {
+//const PinGrid = ({ userId, photoUrls, savedPins = [] }) => {
 
-  const breakpoints = { default: 4 };
-  const baseWidth = 503;
-  const increment = 252;
-  for (let i = 0; i < 30; i++) {
-    breakpoints[baseWidth + increment * i] = i + 1;
-  }
+  //const breakpoints = { default: 4 };
+  //const baseWidth = 503;
+  //const increment = 252;
+  //for (let i = 0; i < 30; i++) {
+   // breakpoints[baseWidth + increment * i] = i + 1;
+  //}
 
 //   return (
 //     <div>
@@ -29,6 +29,16 @@ const PinGrid = ({ userId, photoUrls, savedPins = [] }) => {
 //     </div>
 //   );
 // };
+
+
+const PinGrid = ({ userId, pins = [], savedPins = [], likedPins = [] }) => {
+
+  const breakpoints = {
+    default: 4,
+    1200: 3,
+    900: 2,
+    600: 1
+  };
 
   return (
     <div>

@@ -1,7 +1,9 @@
 import * as unsplashService from "../services/unsplash";
 import * as userService from "../services/users";
 
-export const FETCH_SAVED_PINS = "FETCH_SAVED_PINS";
+
+export const FETCH_LIKED_PINS = "FETCH_LIKED_PINS";
+
 export const SET_FEED = "SET_FEED";
 export const SAVE_PIN = "SAVE_PIN";
 export const LIKE_PIN = "LIKE_PIN";
@@ -12,7 +14,6 @@ export const CREATE_CUSTOM_PIN = "CREATE_CUSTOM_PIN";
 // Action types
 export const SET_FOLLOWERS = "SET_FOLLOWERS";
 export const SET_FOLLOWING = "SET_FOLLOWING";
-
 
 export const getSavedPins =
   ({ userId, setAsFeed }) =>
@@ -29,6 +30,24 @@ export const getSavedPins =
       });
     }
   };
+
+  
+  export const getLikedPins = ({ userId, setAsFeed }) => async (dispatch) => {
+    const response = await userService.getProfile(userId);
+  
+    dispatch({
+      type: FETCH_LIKED_PINS,
+      photoUrls: response.data.likedPins,
+    });
+  
+    if (setAsFeed) {
+      dispatch({
+        type: SET_FEED,
+        photoUrls: response.data.likedPins,
+      });
+    }
+  };
+  
 
 export const likePin = ({ userId, photoUrl }) => async (dispatch) => {
   try {

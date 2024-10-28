@@ -3,7 +3,7 @@ import ModalUnstyled from "@mui/core/ModalUnstyled";
 import { styled } from "@mui/system";
 import { useDispatch } from "react-redux";
 import "./Pin.css";
-import { savePin, deleteSavedPin } from "../actions/pin";
+import { savePin, deleteSavedPin, likePin, unlikePin } from "../actions/pin";
 import { followUser, unfollowUser, checkIfFollowing } from '../services/users';
 
 const Dialog = styled(ModalUnstyled)`
@@ -215,13 +215,6 @@ const handleFollow = async () => {
     console.error('Failed to follow/unfollow user:', error);
   }
 };
-
-
-
-
-
-
-
 
 
 
