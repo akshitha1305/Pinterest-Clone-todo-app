@@ -3,50 +3,13 @@ const jwt = require("jsonwebtoken");
 const usersRouter = require("express").Router();
 const passport = require("passport");
 const User = require("../models/user");
-
-// usersRouter.post("/signup", async (request, response) => {
-//   const body = request.body;
-
-//   let user;
-//   try {
-//     user = await User.findOne({ username: body.username });
-//   } catch (exception) {
-//     return response
-//       .status(500)
-//       .json({ error: "A database error has occurreddd" });
-//   }
-//   if (user) {
-//     return response
-//       .status(400)
-//       .json({ error: "The username has already been taken" });
-//   }
-
-//   const saltRounds = 10;
-//   const passwordHash = await bcrypt.hash(body.password, saltRounds);
-
-//   const newUser = new User({
-//     username: body.username,
-//     name: body.name,
-//     passwordHash: passwordHash,
-//   });
-
-//   try {
-//     const savedUser = await newUser.save();
-//     return response.json(savedUser);
-//   } catch (exception) {
-//     return response
-//       .status(500)
-//       .json({ error: "A database error has occurred" });
-//   }
-// });
+//signup route
 usersRouter.post("/signup", async (request, response) => {
   const body = request.body;
-
-  try {
+try {
     // Log the incoming request body (make sure to not log passwords in production)
     console.log("Signup attempt:", { username: body.username, name: body.name });
-
-    const existingUser = await User.findOne({ username: body.username });
+  const existingUser = await User.findOne({ username: body.username });
 
     if (existingUser) {
       console.log("Username already exists:", body.username);
@@ -63,33 +26,14 @@ usersRouter.post("/signup", async (request, response) => {
       name: body.name,
       passwordHash: passwordHash,
     });
+  
+ 
 
-    // Log the new user object before saving (omit sensitive data)
-    console.log("Attempting to save new user:", {
-      username: newUser.username,
-      name: newUser.name
-    });
 
-    const savedUser = await newUser.save();
-    console.log("User saved successfully:", savedUser._id);
-    return response.json(savedUser);
-  } catch (exception) {
-    console.error("Error during user signup:", exception);
 
-    // Check for specific MongoDB errors
-    if (exception.name === 'ValidationError') {
-      return response.status(400).json({ error: "Invalid user data: " + exception.message });
-    }
-    if (exception.name === 'MongoServerError' && exception.code === 11000) {
-      return response.status(400).json({ error: "Username must be unique" });
-    }
 
-    return response
-      .status(500)
-      .json({ error: "A database error has occurred", details: exception.message });
-  }
-});
 
+#login route
 usersRouter.post("/login", async (request, response) => {
   const body = request.body;
 
@@ -119,14 +63,20 @@ usersRouter.post("/login", async (request, response) => {
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 3600 });
 
-  return response.status(200).send({ token: `Bearer ${token}` });
+  // return response.status(200).send({ token: `Bearer ${token}` });
+  return response.status(200).send({
+    token: `Bearer ${token}`, // Return the token with Bearer prefix
+    userId: user._id // Return the user ID
+  });
 });
+
 
 usersRouter.get(
   "/:id",
   passport.authenticate("jwt", { session: false }),
   async (request, response) => {
     try {
+      console.log('Getting user data', request.params.id);
       const user = await User.findById(request.params.id);
       return response.json(user);
     } catch (exception) {
@@ -215,5 +165,52 @@ usersRouter.put(
     }
   }
 );
+
+
+// Route to unfollow a user
+usersRouter.post('/unfollow/user', async (req, res) => {
+  const { userIdToUnfollow, loggedInUserId } = req.body;
+
+  try {
+    // Update the followers list of the target user (userIdToUnfollow)
+    await User.findByIdAndUpdate(userIdToUnfollow, {
+      $pull: { followers: loggedInUserId }
+    });
+
+    // Update the following list of the logged-in user
+    await User.findByIdAndUpdate(loggedInUserId, {
+      $pull: { following: userIdToUnfollow }
+    });
+
+    res.status(200).json({ message: "User unfollowed successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to unfollow user" });
+  }
+});
+
+// Route to get followers of a user
+usersRouter.get('/:userId/followers', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId).populate('followers', 'username name');
+    res.status(200).json(user.followers);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to get followers" });
+  }
+});
+
+// Route to get users the logged-in user is following
+usersRouter.get('/:userId/following', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId).populate('following', 'username name');
+    res.status(200).json(user.following);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to get following list" });
+  }
+});
+
 
 module.exports = usersRouter;
