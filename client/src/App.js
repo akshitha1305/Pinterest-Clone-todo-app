@@ -5,9 +5,12 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import FormLayout from "./components/FormLayout";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
+import Forgot from "./pages/Forgot";
+import CreatePin from "./pages/CreatePin";
 import Profile from "./pages/Profile";
 import Signup from "./pages/Signup";
 import Search from "./pages/Search";
+import ChangePass from "./pages/ChangePass";
 import { RequireAuth, NotRequireAuth } from "./routes/routes";
 
 const App = () => {
@@ -21,6 +24,12 @@ const App = () => {
               <NotRequireAuth>
                 <Login />
               </NotRequireAuth>
+            }
+          />
+          <Route
+            path="/forgot"
+            element={
+                <Forgot />
             }
           />
           <Route
@@ -41,6 +50,14 @@ const App = () => {
           }
         />
         <Route
+          path="/change-password"
+          element={
+            <RequireAuth>
+              <ChangePass />
+            </RequireAuth>
+          }
+        />
+        <Route
           path="/search/:query"
           element={
             <RequireAuth>
@@ -53,6 +70,14 @@ const App = () => {
           element={
             <RequireAuth>
               <Home />
+            </RequireAuth>
+          }
+        />
+         <Route
+          path="/pin/create"
+          element={
+            <RequireAuth>
+              <CreatePin />
             </RequireAuth>
           }
         />
