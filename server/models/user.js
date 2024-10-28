@@ -1,6 +1,21 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
+const pinSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  imageUrl: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -21,6 +36,11 @@ const userSchema = new mongoose.Schema({
   likedPins: {
     type: [String],
   },
+  customPins: {
+    type: [pinSchema], // Array of custom pins based on pinSchema
+  },
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // List of users following this user
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // List of users this user is following
 });
 
 userSchema.plugin(uniqueValidator);
