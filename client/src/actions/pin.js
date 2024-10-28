@@ -1,7 +1,7 @@
 import * as unsplashService from "../services/unsplash";
 import * as userService from "../services/users";
 
-
+export const FETCH_SAVED_PINS = "FETCH_SAVED_PINS";
 export const FETCH_LIKED_PINS = "FETCH_LIKED_PINS";
 
 export const SET_FEED = "SET_FEED";
