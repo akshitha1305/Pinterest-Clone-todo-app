@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const usersRouter = require("express").Router();
 const passport = require("passport");
 const User = require("../models/user");
+
 //signup route
 usersRouter.post("/signup", async (request, response) => {
   const body = request.body;
@@ -33,7 +34,7 @@ try {
   }
 });
  
-#login route
+//login route
 usersRouter.post("/login", async (request, response) => {
   const body = request.body;
 
@@ -203,6 +204,44 @@ usersRouter.post(
     }
   }
 );
+
+usersRouter.get("/get/random-pins", async (request, response) => {
+  try {
+    // Query MongoDB for custom pins in all users
+    const randomPins = await User.aggregate([
+      { $match: { customPins: { $exists: true, $not: { $size: 0 } } } }, // Only include users with customPins
+      { $unwind: "$customPins" }, // Unwind the customPins array
+      { $sample: { size: 100 } }, // Get a random sample of 100 pins (adjust size as needed)
+      {
+        $project: {
+          _id: 0,
+          "customPins.title": 1,
+          "customPins.imageUrl": 1,
+          "customPins.createdAt": 1,
+          username: 1,
+          _id: 1,
+          name: 1 // Include username and name fields
+        }
+      }
+    ]);
+
+    if (!randomPins || randomPins.length === 0) {
+      return response.status(404).json({ error: "No pins found" });
+    }
+
+    // Respond with the random pins, including username and name
+    response.json(randomPins.map(pin => ({
+      title: pin.customPins.title,
+      imageUrl: pin.customPins.imageUrl,
+      createdAt: pin.customPins.createdAt,
+      username: pin.username,
+      pin_owner_id: pin._id,
+      name: pin.name
+    })));
+  } catch (error) {
+    response.status(500).json({ error: "A database error has occurred" });
+  }
+});
 
 // Route to follow a user
 usersRouter.post('/follow/user', async (req, res) => {
