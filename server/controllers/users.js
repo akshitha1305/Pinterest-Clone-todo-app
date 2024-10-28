@@ -26,13 +26,13 @@ try {
       name: body.name,
       passwordHash: passwordHash,
     });
-  
+    const savedUser = await newUser.save();
+    return response.json(savedUser);
+  } catch (exception) {
+    return response.status(500).json({ error: "A database06 error has occurred", details: exception.message });
+  }
+});
  
-
-
-
-
-
 #login route
 usersRouter.post("/login", async (request, response) => {
   const body = request.body;
@@ -162,6 +162,44 @@ usersRouter.put(
       return response
         .status(500)
         .json({ error: "A database error has occurred" });
+    }
+  }
+);
+
+
+
+// New endpoint: Create a custom pin
+usersRouter.post(
+  "/:id/create-pin",
+  passport.authenticate("jwt", { session: false }),
+  async (request, response) => {
+    const { title, imageUrl } = request.body;
+
+    try {
+      // Create a new pin object
+      const newPin = {
+        title,
+        imageUrl,
+        createdAt: new Date(),
+      };
+
+      // Update the user by adding the new pin to the customPins array
+      const updatedUser = await User.findByIdAndUpdate(
+        request.params.id,
+        { $push: { customPins: newPin } }, // Push the new pin to the customPins array
+        { new: true, runValidators: true } // Return the updated user and run validation
+      );
+
+      if (!updatedUser) {
+        return response.status(404).json({ error: "User not found" });
+      }
+
+      return response.status(201).json(updatedUser);
+    } catch (exception) {
+      console.error("Error creating custom pin:", exception);
+      return response
+        .status(500)
+        .json({ error: "A database error has occurred", details: exception.message });
     }
   }
 );
