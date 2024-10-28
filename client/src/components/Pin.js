@@ -217,6 +217,13 @@ const handleFollow = async () => {
 };
 
 
+const handleHidePin = () => {
+  console.log("Hide Pin clicked");
+};
+
+const handleReportPin = () => {
+  console.log("Report Pin clicked");
+};
 
   return (
     <div className="pin__wrapper">
