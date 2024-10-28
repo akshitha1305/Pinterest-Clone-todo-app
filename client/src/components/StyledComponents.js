@@ -214,3 +214,90 @@ export const CommentBox = styled("div")`
     }
   }
 `;
+
+export const CommentInput = styled("div")`
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding: 16px 0;
+  border-top: 1px solid #efefef;
+  
+  .input-container {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    
+    img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+    
+    input {
+      flex: 1;
+      border: none;
+      background: #f0f0f0;
+      border-radius: 24px;
+      padding: 12px 16px;
+      font-size: 16px;
+      
+      &:focus {
+        outline: none;
+        background: #e9e9e9;
+      }
+    }
+  }
+`;
+
+export const LikersModal = styled(Dialog)`
+  .content {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 400px;
+    width: 400px;
+    max-height: 600px;
+    overflow-y: auto;
+    
+    h3 {
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #efefef;
+    }
+  }
+`;
+
+export const UserListItem = styled("div")`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+`;
+
+export const UserInfo = styled("div")`
+  display: flex;
+  align-items: center;
+`;
+
+export const UserAvatar = styled("img")`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+`;
+
+export const UserName = styled("span")`
+  font-size: 16px;
+  font-weight: 500;
+`;
+
+
+// export const UserAvatar = styled("img")`
+//   width: 40px;
+//   height: 40px;
+//   border-radius: 50%; // Make it round
+//   object-fit: cover; // Ensures it keeps a good proportion
+//   margin-right: 0px;
+// `;
