@@ -4,6 +4,7 @@ export const instance = axios.create({
   baseURL: "/api/users",
 });
 
+// User authentication
 export const signup = async (userData) => {
   return await instance.post("/signup", userData);
 };
@@ -13,11 +14,10 @@ export const login = async (userData) => {
   console.log('response is:', response);
   const { token, user } = response.data;
 
-  console.log('data is:', response.data.userId);
-
   localStorage.setItem('userId', response.data.userId);
   return await instance.post("/login", userData);
 };
+
 export const forgot = async (userData) => {
   return await instance.post("/forgot", userData);
 };
@@ -26,6 +26,7 @@ export const updateUserPassword = async (userId, currentPassword, newPassword) =
   return await instance.put(`/update-password`, { userId, currentPassword, newPassword });
 };
 
+// User profile and saved pins
 export const getProfile = async (userId) => {
   return await instance.get(`/${userId}`);
 };
@@ -88,3 +89,24 @@ export const getFollowing = async (userId) => {
   return await instance.get(`/${userId}/following`);
 };
 
+// Add a comment to a specific pin
+export const addComment = async (commentData) => {
+  try {
+    const response = await instance.post(`/pin/add-comment`, commentData);
+    return response.data; // Return the added comment
+  } catch (error) {
+    console.error("Failed to add comment:", error);
+    throw error;
+  }
+};
+
+// Function to get comments for a specific pin
+export const getComments = async (pinId) => {
+  try {
+    const response = await instance.get(`/pin/${pinId}/comments`);
+    return response.data; // Return the array of comments
+  } catch (error) {
+    console.error("Failed to get comments:", error);
+    throw error;
+  }
+};
