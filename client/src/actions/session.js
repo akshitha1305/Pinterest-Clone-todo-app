@@ -42,7 +42,9 @@ export const login = (userData) => async (dispatch) => {
   try {
     const response = await userService.login(userData);
     const token = response.data.token;
+    const auth_username = response.data.username;
     localStorage.setItem("jwtToken", token);
+    localStorage.setItem("authusername", auth_username);
     setAuthToken(token);
     dispatch(setCurrentUser(jwtDecode(token)));
   } catch (exception) {
