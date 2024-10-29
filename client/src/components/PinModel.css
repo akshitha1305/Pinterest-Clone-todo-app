@@ -1,0 +1,7 @@
+.comment-text {
+  display: flex;
+  align-items: left;
+  padding-left: 1px;
+  margin-left: 1px;
+  font-style: italic;
+}
