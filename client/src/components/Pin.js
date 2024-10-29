@@ -1,172 +1,62 @@
-import React, { useState } from "react";
-import ModalUnstyled from "@mui/core/ModalUnstyled";
-import { styled } from "@mui/system";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import "./Pin.css";
 import { savePin, deleteSavedPin, likePin, unlikePin } from "../actions/pin";
-import { followUser, unfollowUser, checkIfFollowing } from '../services/users';
+import { followUser, unfollowUser, checkIfFollowing, addComment, getComments } from '../services/users';
+import {
+  Dialog,
+  Backdrop,
+  SaveButton,
+  LikeButton,
+  IconButton,
+  MoreMenu,
+  MenuItem,
+  UsernameContainer,
+  FollowButton,
+  ModalContainer,
+  ImageSection,
+  ContentSection,
+  StatsSection,
+  CommentsSection,
+  CommentBox,
+  CommentInput,
+  LikersModal,
+  UserAvatar,
+  UserListItem,
+  UserInfo,
+  UserName
+} from "./StyledComponents";
+import "./Pin.css";
+import "../components/PinModal.css";
 
-const Dialog = styled(ModalUnstyled)`
-  position: fixed;
-  z-index: 1300;
-  right: 0;
-  bottom: 0;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const Backdrop = styled("div")`
-  z-index: -1;
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  top: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  -webkit-tap-highlight-color: transparent;
-`;
-
-const SaveButton = styled("button")`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: ${props => (props.isSaved ? "#e60023" : "#fff")}; /* Pinterest red when saved */
-  color: ${props => (props.isSaved ? "#fff" : "#111")}; /* White text if saved */
-  border: none;
-  border-radius: 24px;
-  font-weight: bold;
-  font-size: 14px;
-  padding: 10px 16px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: ${props => (props.isSaved ? "#cc0020" : "#f0f0f0")};
-  }
-`;
-
-const LikeButton = styled("button")`
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background-color: ${props => (props.isLiked ? "#ff4757" : "#fff")}; /* Red when liked */
-  color: ${props => (props.isLiked ? "#fff" : "#111")}; /* White text if liked */
-  border: none;
-  border-radius: 24px;
-  font-weight: bold;
-  font-size: 14px;
-  padding: 10px 16px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: ${props => (props.isLiked ? "#e84141" : "#f0f0f0")}; /* Darker red on hover if liked */
-  }
-`;
-
-const IconButton = styled("button")`
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 24px;
-  border: none;
-  padding: 8px;
-  margin: 0 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
-
-  // &:hover {
-  //   background-color: #f0f0f0;
-  // }
-
-   &:hover {
-    background-color: ${props => (props.isLiked ? "#e84141" : "#f0f0f0")}; /* Darker red on hover if liked */
-  }
-
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-`;
-
-const MoreMenu = styled("div")`
-  position: absolute;
-  background-color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  padding: 10px;
-  top: 30px;
-  right: 0;
-  width: 220px;
-  display: ${({ open }) => (open ? "block" : "none")};
-  z-index: 999;
-`;
-
-const MenuItem = styled("div")`
-  padding: 8px 16px;
-  cursor: pointer;
-  &:hover {
-    background-color: #f5f5f5;
-  }
-`;
-
-const UsernameContainer = styled("div")`
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  display: flex;
-  align-items: center;
-  color: white;  /* White text to contrast with the image */
-`;
-
-const FollowButton = styled("button")`
-  background-color: #0073e6;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 6px 12px;
-  margin-left: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #005bb5;
-  }
-`;
-
-const Pin = ({ userId, username, pin_owner_id, title, photoUrl, isSaved, isLiked }) => {
+const Pin = ({ userId, auth_username, username, totalLikes, likers, pin_owner_id, title, photoUrl, pin_id, isSaved, isLiked }) => {
   const dispatch = useDispatch();
   const [openDialog, setOpenDialog] = useState(false);
   const [showButton, setShowButton] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // State for following
   const [isFollowing, setIsFollowing] = useState(false);
+  const [showLikers, setShowLikers] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [setTotalLikes] = useState(0);
+  const [setLikers] = useState([]);
 
-  // Fetch whether the logged-in user is following the pin owner
-  useEffect(() => {
-    const fetchFollowStatus = async () => {
-      try {
-        const isFollowingResponse = await checkIfFollowing(pin_owner_id);
-        setIsFollowing(isFollowingResponse);
-      } catch (error) {
-        console.error("Failed to check follow status:", error);
-      }
-    };
+  // Function to fetch comments for the pin
+  const fetchComments = async () => {
+    try {
+      const data = await getComments(pin_id);
+      setComments(data); // Load comments into local state
+    } catch (error) {
+      console.error("Failed to fetch comments:", error);
+    }
+  };
 
-    fetchFollowStatus();
-  }, [pin_owner_id]);
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+    fetchComments(); // Fetch comments when the modal opens
+  };
 
-  const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
 
-  // Save pin logic
   const handleOnClick = (event) => {
     event.preventDefault();
     isSaved
@@ -174,134 +64,195 @@ const Pin = ({ userId, username, pin_owner_id, title, photoUrl, isSaved, isLiked
       : dispatch(savePin({ userId, photoUrl }));
   };
 
-  // Like/Unlike logic
   const handleLike = (event) => {
     event.preventDefault();
-    if (isLiked) {
-      dispatch(unlikePin({ userId, photoUrl }));
-    } else {
-      dispatch(likePin({ userId, photoUrl }));
+    isLiked
+      ? dispatch(unlikePin({ userId, photoUrl }))
+      : dispatch(likePin({ userId, photoUrl }));
+  };
+
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(photoUrl);
+      const blob = await response.blob();
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = title || "pin-image";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Failed to download image", error);
     }
   };
 
-
-    // Download Pin using blob
-    const handleDownload = async () => {
-      try {
-        const response = await fetch(photoUrl);
-        const blob = await response.blob();
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = title || "pin-image"; // Set download file name
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link); // Clean up
-      } catch (error) {
-        console.error("Failed to download image", error);
+  const handleFollow = async () => {
+    try {
+      if (isFollowing) {
+        await unfollowUser(pin_owner_id);
+      } else {
+        await followUser(pin_owner_id);
       }
-    };
-// Function to handle follow/unfollow
-const handleFollow = async () => {
-  try {
-    if (isFollowing) {
-      // Call the unfollow API if the user is currently being followed
-      await unfollowUser(pin_owner_id);
-    } else {
-      // Call the follow API if the user is not being followed yet
-      await followUser(pin_owner_id);
+      setIsFollowing(!isFollowing);
+    } catch (error) {
+      console.error("Failed to follow/unfollow user:", error);
     }
-    setIsFollowing(!isFollowing); // Toggle follow state
-  } catch (error) {
-    console.error('Failed to follow/unfollow user:', error);
-  }
-};
+  };
 
+  const handleComment = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
 
-const handleHidePin = () => {
-  console.log("Hide Pin clicked");
-};
+    const newCommentObj = {
+      pin_id,
+      userId,
+      auth_username,
+      avatarUrl: "https://img.freepik.com/premium-vector/collection-hand-drawn-profile-icons_1323905-5.jpg?w=740",
+      text: newComment
+    };
 
-const handleReportPin = () => {
-  console.log("Report Pin clicked");
-};
+    try {
+      await addComment(newCommentObj); // Save the new comment to the backend
+      setNewComment(""); // Clear the input first
+      await fetchComments(); // Refresh comments after adding a new one
+    } catch (error) {
+      console.error("Failed to save comment:", error);
+    }
+  };
+
+  // Helper function to format the time ago in a human-readable way
+  const formatTimeAgo = (timestamp) => {
+    const now = new Date();
+    const timeDifference = now - new Date(timestamp);
+
+    const seconds = Math.floor(timeDifference / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const months = Math.floor(days / 30);
+    const years = Math.floor(days / 365);
+
+    if (seconds < 60) return "just now";
+    if (minutes < 60) return `${minutes} min${minutes > 1 ? "s" : ""} ago`;
+    if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    if (days < 30) return `${days} day${days > 1 ? "s" : ""} ago`;
+    if (months < 12) return `${months} month${months > 1 ? "s" : ""} ago`;
+    return `${years} year${years > 1 ? "s" : ""} ago`;
+  };
 
   return (
     <div className="pin__wrapper">
-        <div
-          className="pin__container"
-          onMouseOver={() => setShowButton(true)}
-          onMouseLeave={() => setShowButton(false)}
-          title={title} 
-        >
-          <div onClick={handleOpenDialog}>
-            <img src={`${photoUrl}&w=236`}  alt={title} />
-          </div>
-          {/* Show the Save button only on hover */}
-          {showButton && (
-            <SaveButton
-            onClick={handleOnClick}
-            isSaved={isSaved}
-          >
+      <div
+        className="pin__container"
+        onMouseOver={() => setShowButton(true)}
+        onMouseLeave={() => setShowButton(false)}
+        title={title}
+      >
+        <div onClick={handleOpenDialog}>
+          <img src={`${photoUrl}&w=236`} alt={title} />
+        </div>
+
+        {showButton && (
+          <SaveButton onClick={handleOnClick} isSaved={isSaved}>
             {isSaved ? "Saved" : "Save"}
           </SaveButton>
         )}
       </div>
 
-      {/* Modal Content */}
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        BackdropComponent={Backdrop}
-      >
-        <div className="dialog__container">
-        <div className="modal__image-container" style={{ position: "relative" }}>
-            {/* Modal image */}
-            <img src={`${photoUrl}&w=400`} alt={title} style={{ maxWidth: "100%", borderRadius: "8px" }} />
-
-            {/* Save button in top-right corner of modal image */}
-            <SaveButton
-              onClick={handleOnClick}
-              isSaved={isSaved}
-              style={{ position: "absolute", top: "10px", right: "10px" }}
-            >
+      <Dialog open={openDialog} onClose={handleCloseDialog} BackdropComponent={Backdrop}>
+        <ModalContainer>
+          <ImageSection>
+            <img src={`${photoUrl}&w=508`} alt={title} />
+            <SaveButton onClick={handleOnClick} isSaved={isSaved}>
               {isSaved ? "Saved" : "Save"}
-             
-            </SaveButton> 
-  
-            {/* Like button in top-left corner of modal image */}
-            <LikeButton
-              onClick={handleLike}
-              isLiked={isLiked} // Change to lowercase
-              // style={{ position: "absolute", top: "10px", right: "10px" }}
-            >
+            </SaveButton>
+            <LikeButton onClick={handleLike} isLiked={isLiked}>
               {isLiked ? "Liked" : "Like"}
             </LikeButton>
-
-             {/* Action Buttons */}
-             <div className="icon-buttons__container" style={{ position: "absolute", bottom: "10px", right: "10px", display: "flex" }}>
+            <div className="icon-buttons__container" style={{ position: "absolute", bottom: "10px", right: "10px", display: "flex" }}>
               <IconButton aria-label="More Options" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 100-1.5.75.75 0 000 1.5zm0 4.5a.75.75 0 100-1.5.75.75 0 000 1.5zm0 4.5a.75.75 0 100-1.5.75.75 0 000 1.5z" />
                 </svg>
               </IconButton>
 
-              {/* Dropdown Menu */}
               <MoreMenu open={isMenuOpen}>
-                <MenuItem onClick={handleHidePin}>Hide Pin</MenuItem>
+                <MenuItem onClick={() => console.log("Hide Pin clicked")}>Hide Pin</MenuItem>
                 <MenuItem onClick={handleDownload}>Download Image</MenuItem>
-                <MenuItem onClick={handleReportPin}>Report Pin</MenuItem>
+                <MenuItem onClick={() => console.log("Report Pin clicked")}>Report Pin</MenuItem>
               </MoreMenu>
             </div>
 
-           {/* Username and Follow Button at Bottom-Left inside modal */}
-           <UsernameContainer>
+            <UsernameContainer>
               <strong>{username}</strong>
-              <FollowButton onClick={handleFollow}> {isFollowing ? 'Unfollow' : 'Follow'}</FollowButton>
+              <FollowButton onClick={handleFollow}>
+                {isFollowing ? 'Unfollow' : 'Follow'}
+              </FollowButton>
             </UsernameContainer>
-            
-            </div>  
-        </div>
+          </ImageSection>
+
+          <ContentSection>
+            <StatsSection>
+              <button onClick={() => setShowLikers(true)}>
+                <span>{totalLikes}</span>
+                <span>Likes</span>
+              </button>
+            </StatsSection>
+
+            <CommentsSection>
+              {comments.length > 0 ? (
+                comments.map(comment => (
+                  <CommentBox key={comment._id}>
+                    <div className="comment-header">
+                      <img src='https://img.freepik.com/premium-vector/collection-hand-drawn-profile-icons_1323905-5.jpg?w=740' />
+                      <span className="username">{comment.username}</span>
+                      {/* <span className="timestamp">{new Date(comment.timestamp).toLocaleString()}</span> */}
+                      <span className="timestamp">{formatTimeAgo(comment.timestamp)}</span>
+
+                    </div>
+                    <div className="comment-text">{comment.text}</div>
+                  </CommentBox>
+                ))
+              ) : (
+                <p>No comments yet. Be the first to comment!</p>
+              )}
+            </CommentsSection>
+
+            <CommentInput>
+              <form onSubmit={handleComment}>
+                <div className="input-container">
+                  <img src="https://img.freepik.com/premium-vector/collection-hand-drawn-profile-icons_1323905-5.jpg?w=740" alt="Your avatar" />
+                  <input
+                    type="text"
+                    placeholder="Add a comment"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                  />
+                </div>
+              </form>
+            </CommentInput>
+          </ContentSection>
+        </ModalContainer>
       </Dialog>
+
+      {/* Likers Modal */}
+      <LikersModal open={showLikers} onClose={() => setShowLikers(false)} BackdropComponent={Backdrop}>
+        <div className="content">
+          <h3>Liked by</h3>
+          {likers && likers.length > 0 ? (
+            likers.map(user => (
+              <UserListItem key={user.id}>
+                <UserInfo>
+                  <UserAvatar src='https://img.freepik.com/premium-vector/collection-hand-drawn-profile-icons_1323905-5.jpg?w=740' />
+                  <UserName>{user.username}</UserName>
+                </UserInfo>
+              </UserListItem>
+            ))
+          ) : (
+            <p>No users have liked this pin yet.</p>
+          )}
+        </div>
+      </LikersModal>
     </div>
   );
 };
