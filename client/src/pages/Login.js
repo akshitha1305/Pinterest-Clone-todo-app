@@ -47,6 +47,7 @@ const LoginFormLayout = () => {
           Signin Now
         </button>
       </form>
+      <Link to="/forgot">Forgot password? Click here to reset</Link>
       <Link to="/signup">No account yet? Sign Up Now</Link>
     </>
   );
