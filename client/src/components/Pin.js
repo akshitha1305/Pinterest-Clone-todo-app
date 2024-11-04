@@ -120,6 +120,39 @@ const Pin = ({ userId, auth_username, username, totalLikes, likers, pin_owner_id
     }
   };
 
+  // Editing pin function
+  const handleEditPin = async () => {
+    const newTitle = prompt("Enter new title:", title);
+    const newImageUrl = prompt("Enter new url:", photoUrl);
+    if (newTitle === null || newImageUrl === null) return; // Cancel if user clicks "Cancel"
+
+    try {
+      const updatedData = { title: newTitle, imageUrl: newImageUrl };
+      const response = await editPin(pin_id, updatedData);
+      window.alert("Pin updated successfully"); // Show success message
+      handleCloseDialog();
+
+    } catch (error) {
+      console.error("Failed to edit pin:", error);
+    }
+  };
+
+  // Deleting pin function
+  const handleDeletePin = async () => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this pin?");
+    if (!confirmDelete) return;
+
+    try {
+      await deletePin(pin_id);
+      window.alert("Pin deleted successfully");
+      handleCloseDialog();
+    } catch (error) {
+      console.error("Failed to delete pin:", error);
+      window.alert("Failed to delete pin. Please try again."); // Show error message
+    }
+  };
+
+  
   // Helper function to format the time ago in a human-readable way
   const formatTimeAgo = (timestamp) => {
     const now = new Date();
