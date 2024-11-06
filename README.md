@@ -8,4 +8,5 @@
   
 - Run `npm run client` to start the client.
 - Run `npm run server` to start the server.
-
+  
+To execute our project, it is required to have Node.js version 20 or higher installed, along with a locally running instance of MongoDB.
