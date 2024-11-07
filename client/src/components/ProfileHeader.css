@@ -47,5 +47,27 @@
   .username {
     color: #111;
     margin: 4px 0;
+    align-items: center;
+  }
+  .share-profile-button {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
   }
   
+.share-profile-button:hover {
+  color: #0056b3;
+}
+.share-options {
+  position: absolute;
+  /* top: 100%; */
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
