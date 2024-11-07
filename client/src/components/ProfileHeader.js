@@ -29,6 +29,27 @@ const Backdrop = styled("div")`
 `;
 
 const ProfileHeader = ({ user, followersCount, followingCount, onFollowersClick, onFollowingClick}) => {
+  const location = useLocation();
+  const dispatch = useDispatch();
+  const [showShareOptions, setShowShareOptions] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  const profileUrl = `${window.location.origin}${location.pathname}/${user.username}`;
+  const customMessage = `Please follow my profile at ${profileUrl}`;
+
+  useEffect(() => {
+    const checkFollowingStatus = async () => {
+      try {
+        const followingStatus = await checkIfFollowing(user.id); // Assuming `user.id` is the profile owner's ID
+        setIsFollowing(followingStatus);
+      } catch (error) {
+        console.error("Failed to check following status:", error);
+      }
+    };
+
+    checkFollowingStatus();
+  }, [user.id]);
+  
   return (
     <div className="header__container">
       <div className="avatar__wrapper">
