@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getSavedPins,  getFollowers, getFollowing  } from "../actions/pin";
+import { getSavedPins,  getFollowers, getFollowing, getMyCreatedPins  } from "../actions/pin";
 import NavBar from "../components/NavBar";
 import PinGridProfile from "../components/PinGridProfile";
+import PinGridCreated from "../components/PinGridCreated";
 import ProfileHeader from "../components/ProfileHeader";
 import ModalUnstyled from "@mui/core/ModalUnstyled";
 import { styled } from "@mui/system";
@@ -104,32 +105,57 @@ const UnfollowButton = styled("button")`
   }
 `;
 
+const TabContainer = styled("div")`
+  display: flex;
+  justify-content: center;
+  margin-top: 2px;
+`;
+
+const TabButton = styled("button")`
+  background-color: ${(props) => (props.active ? "#000" : "#ddd")};
+  color: ${(props) => (props.active ? "#fff" : "#000")};
+  border: none;
+  padding: 10px 20px;
+  margin: 0 5px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${(props) => (props.active ? "#333" : "#bbb")};
+  }
+`;
+
 const Profile = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.session.user);
   const userId = user.id;
 
-
   const [localFollowing, setLocalFollowing] = useState([]);
-
-  const { followers = [], following = [] } = useSelector((state) => state.pin); // Default to empty arrays
-
   const [isFollowersModalOpen, setFollowersModalOpen] = useState(false);
   const [isFollowingModalOpen, setFollowingModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("saved");
+  const [loading, setLoading] = useState(true);
+
+  const { followers = [], following = [], saved = [] } = useSelector((state) => state.pin);
+  const createdPins = useSelector((state) => state.pin.created);
+
 
   useEffect(() => {
     dispatch(getSavedPins({ userId, setAsFeed: true }));
     dispatch(getFollowers(userId)); // Fetch followers
     dispatch(getFollowing(userId)); // Fetch following
+
+    setLoading(true);
+      dispatch(getMyCreatedPins(userId)).then(() => setLoading(false));
+
   }, [dispatch, userId]);
   
+
   useEffect(() => {
     // Update local state when following changes in Redux
     setLocalFollowing(following);
   }, [following]);
-
-  const {saved } = useSelector((state) => state.pin);
-
 
   // Function to handle unfollow
   const handleUnfollow = async (followedUserId) => {
@@ -172,7 +198,7 @@ const Profile = () => {
             {followers.map((follower) => (
               <UserListItem key={follower.id}>
                 <UserInfo>
-                  <UserAvatar src="https://img.freepik.com/premium-vector/collection-hand-drawn-profile-icons_1323905-5.jpg?w=740" />
+                  <UserAvatar src="yes" />
                   <UserName>{follower.username}</UserName>
                 </UserInfo>
               </UserListItem>

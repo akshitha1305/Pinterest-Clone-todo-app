@@ -34,8 +34,6 @@ import {
         saved: state.saved,
 
 
-
-
         };
       case SAVE_PIN:
         return {

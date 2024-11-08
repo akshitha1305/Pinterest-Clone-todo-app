@@ -107,9 +107,6 @@
   
 
 
-
-
-
 .dropdown-menu {
   position: absolute;
   top: 50px; /* Adjust as needed */
@@ -146,4 +143,89 @@
 
 .nav-bar__icon-group {
   position: relative;
+}
+
+
+
+
+.nav-bar__search-box {
+  position: relative;
+}
+
+.dropdown-search-results {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  z-index: 1000;
+}
+
+/* NavBar.css */
+
+.nav-bar__search-box {
+  position: relative;
+}
+
+.dropdown-search-results {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.search-results-section h4 {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.searchName {
+  font-size:20px;
+  font-style: italic;
+  font-weight: bolder;
+  
+}
+
+.searchUsername{
+  font-size:14px;
+  display: flex;
+  align-items: left;
+  font-style: italic;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top:9px;
+}
+
+.search-result-item:hover {
+  background-color: #f0f0f0;
+}
+
+.search-result-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
 }

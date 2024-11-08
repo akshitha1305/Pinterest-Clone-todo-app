@@ -71,8 +71,7 @@ usersRouter.post("/login", async (request, response) => {
     userId: user._id // Return the user ID
   });
 });
-
-
+// Get user profile by ID
 usersRouter.get(
   "/:id",
   passport.authenticate("jwt", { session: false }),
@@ -88,6 +87,29 @@ usersRouter.get(
     }
   }
 );
+// Get user by username - this is used to fetch details of another user
+usersRouter.get("/user/:username", async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    // Find the user by username (assuming `username` is unique)
+    const user = await User.findOne({ username: username });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Return the user data, excluding sensitive fields like password
+    res.json({
+      id: user._id,
+      username: user.username,
+      name: user.name,
+    });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Error fetching user data", error: error.message });
+  }
+});
 
 usersRouter.put(
   "/:id/save-pin",
@@ -502,6 +524,72 @@ usersRouter.get('/:userId/following', async (req, res) => {
     res.status(500).json({ error: "Failed to get following list" });
   }
 });
+
+
+// Unified search endpoint to find users by username/name and pins by title
+usersRouter.get("/search/get-results", async (req, res) => {
+  const { query } = req.query;
+
+  if (!query) {
+    return res.status(400).json({ error: "Query parameter is required" });
+  }
+
+  try {
+    // Search for users by username or name
+    const users = await User.find({
+      $or: [
+        { username: { $regex: query, $options: "i" } },
+        { name: { $regex: query, $options: "i" } },
+      ],
+    }).limit(10); // Limit to 10 results for efficiency
+
+    // Search for pins by title within customPins array
+    const pins = await User.aggregate([
+      { $match: { customPins: { $exists: true, $not: { $size: 0 } } } },
+      { $unwind: "$customPins" },
+      { $match: { "customPins.title": { $regex: query, $options: "i" } } },
+      {
+        $lookup: {
+          from: "users",
+          let: { pinImageUrl: "$customPins.imageUrl" },
+          pipeline: [
+            { $match: { likedPins: { $exists: true, $type: "array" } } },
+            { $match: { $expr: { $in: ["$$pinImageUrl", "$likedPins"] } } },
+            { $project: { username: 1, name: 1, avatarUrl: 1 } }
+          ],
+          as: "likers"
+        }
+      },
+      {
+        $addFields: {
+          totalLikes: { $size: "$likers" }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          "customPins._id": 1,
+          "customPins.title": 1,
+          "customPins.imageUrl": 1,
+          "customPins.createdAt": 1,
+          username: 1,
+          pin_owner_id: "$_id",
+          name: 1,
+          likers: 1,
+          totalLikes: 1
+        }
+      },
+      { $limit: 10 } // Limit to 10 results for efficiency
+    ]);
+
+    // Send both user and pin results in the response
+    res.json({ users, pins });
+  } catch (error) {
+    console.error("Error during search:", error);
+    res.status(500).json({ error: "A database error has occurred", details: error.message });
+  }
+});
+
 
 // Hide pin
 usersRouter.put("/pin/hide/:pinId", passport.authenticate('jwt', { session: false }), async (req, res) => {

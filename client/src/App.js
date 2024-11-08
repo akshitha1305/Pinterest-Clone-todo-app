@@ -56,6 +56,15 @@ const App = () => {
             </RequireAuth>
           }
         />
+         {/* New Profile Route with Username */}
+         <Route
+          path="/profile/:username"
+          element={
+            <RequireAuth>
+              <ProfileUser />
+            </RequireAuth>
+          }
+        />
         <Route
           path="/change-password"
           element={

@@ -27,6 +27,11 @@ export const getProfile = async (userId) => {
   return await instance.get(`/${userId}`);
 };
 
+export const getUserByUsername = async (username) => {
+  const response = await instance.get(`/user/${username}`);
+  return response.data;
+};
+
 export const savePin = async ({ userId, photoUrl }) => {
   return await instance.put(`/${userId}/save-pin`, { photoUrl });
 };

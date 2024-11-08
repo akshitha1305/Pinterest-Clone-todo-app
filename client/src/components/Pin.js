@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { savePin, deleteSavedPin, likePin, unlikePin } from "../actions/pin";
-import { followUser, unfollowUser, checkIfFollowing, addComment, getComments } from '../services/users';
+import { followUser, unfollowUser, checkIfFollowing, addComment, getComments, editPin, deletePin } from '../services/users';
 import {
   Dialog,
   Backdrop,

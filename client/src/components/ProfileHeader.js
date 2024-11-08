@@ -1,14 +1,11 @@
 import "./ProfileHeader.css";
 import { Link } from "react-router-dom";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ModalUnstyled from "@mui/core/ModalUnstyled";
 import { styled } from "@mui/system";
-
-
-
-
-
-
+import { useDispatch } from "react-redux";
+import { followUser, unfollowUser, checkIfFollowing } from '../services/users';
+import {FollowButton} from "./StyledComponents";
 
 const Dialog = styled(ModalUnstyled)`
   position: fixed;
@@ -55,6 +52,18 @@ const ProfileHeader = ({ user, followersCount, followingCount, onFollowersClick,
     checkFollowingStatus();
   }, [user.id]);
 
+  const handleFollow = async () => {
+    try {
+      if (isFollowing) {
+        await unfollowUser(user.id);
+      } else {
+        await followUser(user.id);
+      }
+      setIsFollowing(!isFollowing);
+    } catch (error) {
+      console.error("Failed to follow/unfollow user:", error);
+    }
+  };
 
 
 
@@ -111,10 +120,14 @@ const ProfileHeader = ({ user, followersCount, followingCount, onFollowersClick,
           </a>
         </div>
       </div>
-
+      <div className="profile-links">
       <Link to="/change-password">Change Password</Link>
 
-
+      <button onClick={() => setShowShareOptions(!showShareOptions)} className="share-profile-button">Share Profile</button>
+        <FollowButton onClick={handleFollow}>
+          {isFollowing ? 'Unfollow' : 'Follow'}
+        </FollowButton>
+      </div>
 
 
 
@@ -149,7 +162,6 @@ const ProfileHeader = ({ user, followersCount, followingCount, onFollowersClick,
 
 
       <hr></hr>
-      <h2></h2>
     </div>
   );
 };
