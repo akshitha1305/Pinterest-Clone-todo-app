@@ -16,6 +16,9 @@ export const SET_FOLLOWERS = "SET_FOLLOWERS";
 export const SET_FOLLOWING = "SET_FOLLOWING";
 export const HIDE_PIN = 'HIDE_PIN';
 export const UNHIDE_PIN = 'UNHIDE_PIN';
+export const UPDATE_PASSWORD_SUCCESS = "UPDATE_PASSWORD_SUCCESS";
+export const UPDATE_PASSWORD_FAILURE = "UPDATE_PASSWORD_FAILURE";
+
 
 export const getSavedPins =
   ({ userId, setAsFeed }) =>
@@ -103,6 +106,10 @@ export const getRandomPins = () => async (dispatch) => {
   try {
     // Fetch random pins from MongoDB
     const response = await userService.getRandomPins();
+
+    
+
+
     console.log('Fetched Pins:', response.data); 
 
     const pins = response.data;
@@ -128,7 +135,6 @@ export const savePin =
     });
   };
 
-
 export const deleteSavedPin =
   ({ userId, photoUrl }) =>
     async (dispatch) => {
@@ -139,15 +145,23 @@ export const deleteSavedPin =
       });
     };
 
-// Action to update password (already exists in your code)
-export const updatePassword = ({ userId, currentPassword, newPassword }) => async (dispatch) => {
-  try {
-    const response = await userService.updateUserPassword(userId, currentPassword, newPassword);
-    return response;
-  } catch (error) {
-    throw error;
-  }
-};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // New action for creating a custom Pinterest pin
 export const createPin =
@@ -216,3 +230,17 @@ export const unhidePin = (pinId) => async (dispatch) => {
     console.error('Failed to unhide pin:', error);
   }
 };
+// Change password
+export const updatePassword = ({ userId, currentPassword, newPassword }) => async (dispatch) => {
+  try {
+    await userService.updateUserPassword(userId, currentPassword, newPassword);
+    dispatch({ type: UPDATE_PASSWORD_SUCCESS });
+  } catch (error) {
+    dispatch({
+      type: UPDATE_PASSWORD_FAILURE,
+      payload: error.message || "Failed to update password",
+    });
+    throw error;
+  }
+};
+

@@ -78,6 +78,97 @@
 .pin__wrapper {
   margin-bottom: 30px;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Delete Button */
+.delete-button {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  color: #333;
+}
+
+.delete-button .fa-trash {
+  font-size: 16px;
+}
+
+/* Pin.css */
+.blurred {
+  filter: blur(8px);
+  opacity: 0.6;
+}
 .unhide-button {
   position: absolute;
   bottom: 10px;

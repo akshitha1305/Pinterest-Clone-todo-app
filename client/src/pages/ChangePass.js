@@ -1,22 +1,29 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../actions/session";
+import { updatePassword } from "../actions/pin";
 import NavBar from "../components/NavBar";
 import "../components/ChangePass.css"
 
 const ChangePass = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const dispatch = useDispatch();
   const sessionError = useSelector((state) => state.sessionError);
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const handleLogin = (userData) => {
-    dispatch(login(userData));
+  const handlePasswordChange = async (data) => {
+    const userId = localStorage.getItem("userId");
+
+    try {
+      await dispatch(updatePassword({
+        userId,
+        currentPassword: data.current_password,
+        newPassword: data.new_password,
+      }));
+      window.alert("Password successfully updated!");
+    } catch (error) {
+      window.alert("Current password is incorrect!");
+    }
   };
 
   return (

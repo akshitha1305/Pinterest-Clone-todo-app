@@ -3,9 +3,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-
 import "../components/FormLayout.css";
-import { login } from "../actions/session";
+import { requestPasswordReset } from "../actions/session";
 
 const LoginFormLayout = () => {
   const {

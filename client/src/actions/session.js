@@ -1,4 +1,5 @@
 import jwtDecode from "jwt-decode";
+import axios from "axios";
 
 import * as userService from "../services/users.js";
 
@@ -59,4 +60,24 @@ export const logout = () => (dispatch) => {
 };
 
 
+export const requestPasswordReset = (username) => async (dispatch) => {
+  try {
+    const response = await userService.forgot({ username });
+    dispatch(clearError());
+    return response; // Return the response to capture it in the component
+  } catch (exception) {
+    dispatch(receiveError(exception.response.data.error));
+  }
+};
 
+
+export const resetPassword = (data) => async (dispatch) => {
+  try {
+    const response = await userService.resetPassword(data);
+    dispatch(clearError());
+    return response; // Return the response to capture it in the component
+  } catch (exception) {
+    dispatch(receiveError(exception.response.data.error));
+    return Promise.reject(exception.response.data.error); // Return error to capture it as well
+  }
+};

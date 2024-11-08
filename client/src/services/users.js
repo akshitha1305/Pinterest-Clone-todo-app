@@ -22,10 +22,6 @@ export const forgot = async (userData) => {
   return await instance.post("/forgot", userData);
 };
 
-export const updateUserPassword = async (userId, currentPassword, newPassword) => {
-  return await instance.put(`/update-password`, { userId, currentPassword, newPassword });
-};
-
 // User profile and saved pins
 export const getProfile = async (userId) => {
   return await instance.get(`/${userId}`);
@@ -59,6 +55,7 @@ export const createPin = async ({ userId, title, imageUrl }) => {
 export const getRandomPins = async () => {
   return await instance.get("/get/random-pins"); // Assuming you have an endpoint like /api/random-pins
 };
+
 
 // Follow / Unfollow
 export const checkIfFollowing = async (pin_owner_id) => {
@@ -120,4 +117,14 @@ export const unhidePin = async (pinId) => {
   const response = await instance.put(`/pin/unhide/${pinId}`, { pinId });
   return response.data;
 };
+
+// Change password
+export const updateUserPassword = async (userId, currentPassword, newPassword) => {
+  return await instance.put(`/update/password`, { userId, currentPassword, newPassword });
+};
+
+export const resetPassword = async ({ token, newPassword, confirmPassword }) => {
+  return await instance.post("/reset/password", { token, newPassword, confirmPassword });
+};
+
 

@@ -106,6 +106,7 @@ usersRouter.put(
         .json({ error: "A database error has occurred" });
     }
   }
+  
 );
 
 // Like pin
@@ -501,6 +502,7 @@ usersRouter.get('/:userId/following', async (req, res) => {
     res.status(500).json({ error: "Failed to get following list" });
   }
 });
+
 // Hide pin
 usersRouter.put("/pin/hide/:pinId", passport.authenticate('jwt', { session: false }), async (req, res) => {
   const { pinId } = req.params;
@@ -535,7 +537,79 @@ usersRouter.put("/pin/unhide/:pinId", passport.authenticate('jwt', { session: fa
   }
 });
 
+usersRouter.put("/update/password", async (req, res) => {
+  const { userId, currentPassword, newPassword } = req.body;
 
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Verify the current password
+    const isPasswordCorrect = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ message: "Current password is incorrect" });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const newPasswordHash = await bcrypt.hash(newPassword, salt);
+
+    // Update the password hash directly in the database
+    await User.findByIdAndUpdate(userId, { passwordHash: newPasswordHash });
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating password", error: error.message });
+  }
+});
+
+// Request Password Reset
+usersRouter.post("/forgot", async (req, res) => {
+  const { username } = req.body;
+  const user = await User.findOne({ username });
+
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  // Generate reset token
+  const resetToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+  const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}`;
+
+  //res.status(200).json({ message: "Password reset link is: ", resetUrl });
+  res.status(200).json({ message: "Password reset link generated", resetUrl });
+
+});
+
+// Reset Password
+usersRouter.post("/reset/password", async (req, res) => {
+  const { token, newPassword, confirmPassword } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(404).json({ status: 404, error: "User not found" });
+    }
+
+    if (newPassword !== confirmPassword) {
+      res.status(200).json({ status: 200, message: "Passwords do not match" });
+    } else {
+
+      const salt = await bcrypt.genSalt(10);
+      const newPasswordHash = await bcrypt.hash(newPassword, salt);
+      await User.findByIdAndUpdate(decoded.userId, { passwordHash: newPasswordHash });
+
+      res.status(200).json({ status: 200, message: "Password updated successfully" });
+    }
+
+  } catch (error) {
+    res.status(200).json({ status: 200, error: "Invalid or expired token" });
+  }
+});
 
 
 module.exports = usersRouter;

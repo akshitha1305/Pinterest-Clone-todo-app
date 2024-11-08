@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import FormLayout from "./components/FormLayout";
 import Login from "./pages/Login";
+import ResetPassword from "./pages/ResetPassword";
 import Home from "./pages/Home";
 import Forgot from "./pages/Forgot";
 import CreatePin from "./pages/CreatePin";
@@ -29,9 +30,15 @@ const App = () => {
           <Route
             path="/forgot"
             element={
-                <Forgot />
-            }
+                <Forgot />}
+            
           />
+          <Route
+            path="/reset-password"
+            element={
+              <ResetPassword />
+            }
+            />
           <Route
             path="/signup"
             element={
