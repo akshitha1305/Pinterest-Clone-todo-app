@@ -1,9 +1,14 @@
 import "./ProfileHeader.css";
 import { Link } from "react-router-dom";
-
 import React, { useState } from 'react';
 import ModalUnstyled from "@mui/core/ModalUnstyled";
 import { styled } from "@mui/system";
+
+
+
+
+
+
 
 const Dialog = styled(ModalUnstyled)`
   position: fixed;
@@ -49,6 +54,45 @@ const ProfileHeader = ({ user, followersCount, followingCount, onFollowersClick,
 
     checkFollowingStatus();
   }, [user.id]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
   return (
     <div className="header__container">
@@ -67,9 +111,45 @@ const ProfileHeader = ({ user, followersCount, followingCount, onFollowersClick,
           </a>
         </div>
       </div>
+
       <Link to="/change-password">Change Password</Link>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       <hr></hr>
-      <h2>My Saved Pins</h2>
+      <h2></h2>
     </div>
   );
 };

@@ -78,5 +78,19 @@
 .pin__wrapper {
   margin-bottom: 30px;
 }
+.unhide-button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
+
 
   

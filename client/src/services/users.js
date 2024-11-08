@@ -110,3 +110,14 @@ export const getComments = async (pinId) => {
     throw error;
   }
 };
+ //Hide pin
+export const hidePin = async (pinId) => {
+  const response = await instance.put(`/pin/hide/${pinId}`, { pinId });
+  return response.data;
+};
+//unhidePin
+export const unhidePin = async (pinId) => {
+  const response = await instance.put(`/pin/unhide/${pinId}`, { pinId });
+  return response.data;
+};
+

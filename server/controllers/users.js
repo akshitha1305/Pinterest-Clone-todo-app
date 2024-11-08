@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const usersRouter = require("express").Router();
 const passport = require("passport");
 const User = require("../models/user");
+const mongoose = require("mongoose");
 
 //signup route
 usersRouter.post("/signup", async (request, response) => {
@@ -242,7 +243,199 @@ usersRouter.get("/get/random-pins", async (request, response) => {
     response.status(500).json({ error: "A database error has occurred" });
   }
 });
+// Get all pins created by different users
+usersRouter.get("/get/random-pins", passport.authenticate("jwt", { session: false }), async (request, response) => {
+  try {
+    // Fetch the current user's hidden pins array
+    const userId = request.user._id;
+    const user = await User.findById(userId).select("hiddenPins");
 
+    const hiddenPins = user?.hiddenPins || [];
+
+    const randomPins = await User.aggregate([
+      { $match: { customPins: { $exists: true, $not: { $size: 0 } } } },
+      { $unwind: "$customPins" },
+      {
+        $addFields: {
+          isHidden: { $in: ["$customPins._id", hiddenPins] }
+        }
+      },
+      { $sample: { size: 100 } },
+      {
+        $lookup: {
+          from: "users",
+          let: { pinImageUrl: "$customPins.imageUrl" },
+          pipeline: [
+            { $match: { likedPins: { $exists: true, $type: "array" } } },
+            { $match: { $expr: { $in: ["$$pinImageUrl", "$likedPins"] } } },
+            { $project: { username: 1, name: 1, avatarUrl: 1 } }
+          ],
+          as: "likers"
+        }
+      },
+      {
+        $addFields: {
+          totalLikes: { $size: "$likers" }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          "customPins._id": 1,
+          "customPins.title": 1,
+          "customPins.imageUrl": 1,
+          "customPins.createdAt": 1,
+          isHidden: 1,
+          username: 1,
+          pin_owner_id: "$_id",
+          name: 1,
+          likers: 1,
+          totalLikes: 1
+        }
+      }
+    ]);
+
+
+    if (!randomPins || randomPins.length === 0) {
+      return response.status(404).json({ error: "No pins found" });
+    }
+
+    response.json(
+      randomPins.map((pin) => ({
+        pin_id: pin.customPins._id,
+        title: pin.customPins.title,
+        imageUrl: pin.customPins.imageUrl,
+        createdAt: pin.customPins.createdAt,
+        username: pin.username,
+        pin_owner_id: pin.pin_owner_id,
+        name: pin.name,
+        likers: pin.likers,
+        totalLikes: pin.totalLikes
+      }))
+    );
+  } catch (error) {
+    console.error("Error details:", error);
+    response.status(500).json({ error: "A database error has occurred", details: error.message });
+  }
+});
+
+
+// Fetch user created pins
+usersRouter.get("/get/pins/user-pins", async (req, res) => {
+  const { pin_owner_id } = req.query;
+
+  try {
+    const userPins = await User.aggregate([
+      { $match: { _id: mongoose.Types.ObjectId(pin_owner_id), customPins: { $exists: true, $not: { $size: 0 } } } },
+      { $unwind: "$customPins" },
+      {
+        $lookup: {
+          from: "users",
+          let: { pinImageUrl: "$customPins.imageUrl" },
+          pipeline: [
+            { $match: { likedPins: { $exists: true, $type: "array" } } }, // Ensure `likedPins` is an array
+            { $match: { $expr: { $in: ["$$pinImageUrl", "$likedPins"] } } },
+            { $project: { username: 1, name: 1, avatarUrl: 1 } }
+          ],
+          as: "likers"
+        }
+      },
+      {
+        $addFields: {
+          totalLikes: { $size: "$likers" }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          "customPins._id": 1,
+          "customPins.title": 1,
+          "customPins.imageUrl": 1,
+          "customPins.createdAt": 1,
+          username: 1,
+          pin_owner_id: "$_id",
+          name: 1,
+          likers: 1,
+          totalLikes: 1
+        }
+      }
+    ]);
+
+    if (!userPins || userPins.length === 0) {
+      return res.status(404).json({ error: "No pins found for this user" });
+    }
+
+    res.json(userPins.map(pin => ({
+      pin_id: pin.customPins._id,
+      title: pin.customPins.title,
+      imageUrl: pin.customPins.imageUrl,
+      createdAt: pin.customPins.createdAt,
+      username: pin.username,
+      pin_owner_id: pin.pin_owner_id,
+      name: pin.name,
+      likers: pin.likers,
+      totalLikes: pin.totalLikes
+    })));
+  } catch (error) {
+    console.error("Error details:", error);
+    res.status(500).json({ error: "A database error has occurred", details: error.message });
+  }
+});
+
+// Edit pin endpoint
+usersRouter.put("/pin/pin-edit/:pinId", async (req, res) => {
+  const { pinId } = req.params;
+  const { title, imageUrl } = req.body; // New values to update
+
+  try {
+    // Use `$set` to update fields within the subdocument
+    const result = await User.updateOne(
+      { "customPins._id": pinId },
+      {
+        $set: {
+          "customPins.$.title": title,
+          "customPins.$.imageUrl": imageUrl,
+        },
+      }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ error: "Pin not found or no changes made" });
+    }
+
+    res.json({ message: "Pin updated successfully" });
+  } catch (error) {
+    console.error("Error updating pin:", error);
+    res.status(500).json({ error: "Failed to update pin", details: error.message });
+  }
+});
+
+// Delete pin endpoint from the user pins
+usersRouter.delete("/pin/pin-delete/:pinId", async (req, res) => {
+  const { pinId } = req.params;
+  console.log('pin to delete is', pinId);
+
+  try {
+    // Find the user document containing the pin
+    const user = await User.findOne({ "customPins._id": pinId });
+    if (!user) return res.status(404).json({ error: "User or pin not found" });
+
+    // Remove the pin from customPins array using $pull in the update method
+    const result = await User.updateOne(
+      { _id: user._id },
+      { $pull: { customPins: { _id: pinId } } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ error: "Pin not found or already deleted" });
+    }
+
+    res.json({ message: "Pin deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting pin:", error);
+    res.status(500).json({ error: "Failed to delete pin", details: error.message });
+  }
+});
 // Route to follow a user
 usersRouter.post('/follow/user', async (req, res) => {
   const { userIdToFollow, loggedInUserId } = req.body; // userIdToFollow: user to follow, loggedInUserId: logged-in user
@@ -308,6 +501,41 @@ usersRouter.get('/:userId/following', async (req, res) => {
     res.status(500).json({ error: "Failed to get following list" });
   }
 });
+// Hide pin
+usersRouter.put("/pin/hide/:pinId", passport.authenticate('jwt', { session: false }), async (req, res) => {
+  const { pinId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    // Update user's hiddenPins array by adding the pin ID if not already present
+    await User.findByIdAndUpdate(userId, {
+      $addToSet: { hiddenPins: pinId }
+    });
+    res.status(200).json({ message: 'Pin hidden successfully' });
+  } catch (error) {
+    console.error('Failed to hide pin:', error);
+    res.status(500).json({ error: 'Failed to hide pin' });
+  }
+});
+
+// Unhide pin
+usersRouter.put("/pin/unhide/:pinId", passport.authenticate('jwt', { session: false }), async (req, res) => {
+  const { pinId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    // Update user's hiddenPins array by removing the pin ID
+    await User.findByIdAndUpdate(userId, {
+      $pull: { hiddenPins: pinId }
+    });
+    res.status(200).json({ message: 'Pin unhidden successfully' });
+  } catch (error) {
+    console.error('Failed to unhide pin:', error);
+    res.status(500).json({ error: 'Failed to unhide pin' });
+  }
+});
+
+
 
 
 module.exports = usersRouter;

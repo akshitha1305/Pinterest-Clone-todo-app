@@ -31,7 +31,7 @@ import Pin from "./Pin";
 // };
 
 
-const PinGrid = ({ userId, pins = [], savedPins = [], likedPins = [] }) => {
+const PinGrid = ({ userId, pins = [], savedPins = [], likedPins = [],  hiddenPins = [] }) => {
 
   const breakpoints = {
     default: 4,
@@ -39,6 +39,7 @@ const PinGrid = ({ userId, pins = [], savedPins = [], likedPins = [] }) => {
     900: 2,
     600: 1
   };
+  
 
   return (
     <div>
@@ -48,13 +49,19 @@ const PinGrid = ({ userId, pins = [], savedPins = [], likedPins = [] }) => {
             <Pin
               key={pin.imageUrl}
               userId={userId}
+
               photoUrl={pin.imageUrl}
+
+
               username={pin.username}
+
+
               pin_owner_id={pin.pin_owner_id}
               name={pin.name}
               title={pin.title}
               isSaved={savedPins.includes(pin.imageUrl)}
               isLiked={likedPins.includes(pin.imageUrl)} // Check if pin is liked
+              isHidden={hiddenPins.includes(pin.pin_id)}
             />
           ))}
         </Masonry>

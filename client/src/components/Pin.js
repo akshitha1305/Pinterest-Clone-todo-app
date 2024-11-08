@@ -37,8 +37,6 @@ const Pin = ({ userId, auth_username, username, totalLikes, likers, pin_owner_id
   const [showLikers, setShowLikers] = useState(false);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  const [setTotalLikes] = useState(0);
-  const [setLikers] = useState([]);
 
   // Function to fetch comments for the pin
   const fetchComments = async () => {
@@ -152,7 +150,48 @@ const Pin = ({ userId, auth_username, username, totalLikes, likers, pin_owner_id
     }
   };
 
-  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Hide pin
+  const handleHidePin = () => {
+    if (window.confirm('Are you sure you want to hide this pin?')) {
+      dispatch(hidePin(pin_id));
+    }
+  };
+
+  const handleUnhidePin = () => {
+    dispatch(unhidePin(pin_id)); // Dispatch unhide action
+  };
+
   // Helper function to format the time ago in a human-readable way
   const formatTimeAgo = (timestamp) => {
     const now = new Date();
@@ -176,7 +215,7 @@ const Pin = ({ userId, auth_username, username, totalLikes, likers, pin_owner_id
   return (
     <div className="pin__wrapper">
       <div
-        className="pin__container"
+        className={`pin__container ${isHidden ? 'blurred' : ''}`}
         onMouseOver={() => setShowButton(true)}
         onMouseLeave={() => setShowButton(false)}
         title={title}
@@ -184,38 +223,42 @@ const Pin = ({ userId, auth_username, username, totalLikes, likers, pin_owner_id
         <div onClick={handleOpenDialog}>
           <img src={`${photoUrl}&w=236`} alt={title} />
         </div>
-
-        {showButton && (
-          <SaveButton onClick={handleOnClick} isSaved={isSaved}>
-            {isSaved ? "Saved" : "Save"}
-          </SaveButton>
-        )}
       </div>
+
 
       <Dialog open={openDialog} onClose={handleCloseDialog} BackdropComponent={Backdrop}>
         <ModalContainer>
           <ImageSection>
-            <img src={`${photoUrl}&w=508`} alt={title} />
+
+            <img src={`${photoUrl}&w=508`} alt={title} className={isHidden ? 'blurred' : ''}  />
             <SaveButton onClick={handleOnClick} isSaved={isSaved}>
               {isSaved ? "Saved" : "Save"}
             </SaveButton>
             <LikeButton onClick={handleLike} isLiked={isLiked}>
               {isLiked ? "Liked" : "Like"}
             </LikeButton>
-            <div className="icon-buttons__container" style={{ position: "absolute", bottom: "10px", right: "10px", display: "flex" }}>
+            <div className="icon-buttons__container" style={{ position: "absolute", bottom: "10px", right: "10px", display: "flex",gap: "10px" }}>
+              
+              
               <IconButton aria-label="More Options" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 100-1.5.75.75 0 000 1.5zm0 4.5a.75.75 0 100-1.5.75.75 0 000 1.5zm0 4.5a.75.75 0 100-1.5.75.75 0 000 1.5z" />
                 </svg>
               </IconButton>
-
               <MoreMenu open={isMenuOpen}>
-                <MenuItem onClick={() => console.log("Hide Pin clicked")}>Hide Pin</MenuItem>
-                <MenuItem onClick={handleDownload}>Download Image</MenuItem>
-                <MenuItem onClick={() => console.log("Report Pin clicked")}>Report Pin</MenuItem>
+              {userId === pin_owner_id && (
+                  <>
+                    <MenuItem onClick={handleEditPin}>Edit Pin</MenuItem>
+                    <MenuItem onClick={handleDeletePin}>Delete Pin</MenuItem>
+                  </>
+                )}
+                <MenuItem onClick={handleDownload}>Download Pin</MenuItem>
+                {/* Toggle between "Hide" and "Unhide" based on pin visibility */}
+                <MenuItem onClick={isHidden ? handleUnhidePin : handleHidePin}>
+                  {isHidden ? 'Unhide Pin' : 'Hide Pin'}
+                </MenuItem>
               </MoreMenu>
             </div>
-
             <UsernameContainer>
               <strong>{username}</strong>
               <FollowButton onClick={handleFollow}>
@@ -238,12 +281,32 @@ const Pin = ({ userId, auth_username, username, totalLikes, likers, pin_owner_id
                   <CommentBox key={comment._id}>
                     <div className="comment-header">
                       <img src='https://img.freepik.com/premium-vector/collection-hand-drawn-profile-icons_1323905-5.jpg?w=740' />
+
                       <span className="username">{comment.username}</span>
-                      {/* <span className="timestamp">{new Date(comment.timestamp).toLocaleString()}</span> */}
+
+             
                       <span className="timestamp">{formatTimeAgo(comment.timestamp)}</span>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                     </div>
+                    <div>
                     </div>
-                    <div className="comment-text">{comment.text}</div>
                   </CommentBox>
                 ))
               ) : (

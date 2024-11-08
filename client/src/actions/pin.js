@@ -3,7 +3,7 @@ import * as userService from "../services/users";
 
 export const FETCH_SAVED_PINS = "FETCH_SAVED_PINS";
 export const FETCH_LIKED_PINS = "FETCH_LIKED_PINS";
-
+export const FETCH_HIDDEN_PINS = "FETCH_HIDDEN_PINS";
 export const SET_FEED = "SET_FEED";
 export const SAVE_PIN = "SAVE_PIN";
 export const LIKE_PIN = "LIKE_PIN";
@@ -14,6 +14,8 @@ export const CREATE_CUSTOM_PIN = "CREATE_CUSTOM_PIN";
 // Action types
 export const SET_FOLLOWERS = "SET_FOLLOWERS";
 export const SET_FOLLOWING = "SET_FOLLOWING";
+export const HIDE_PIN = 'HIDE_PIN';
+export const UNHIDE_PIN = 'UNHIDE_PIN';
 
 export const getSavedPins =
   ({ userId, setAsFeed }) =>
@@ -44,6 +46,21 @@ export const getSavedPins =
       dispatch({
         type: SET_FEED,
         photoUrls: response.data.likedPins,
+      });
+    }
+  };
+  export const getHiddenPins = ({ userId, setAsFeed }) => async (dispatch) => {
+    const response = await userService.getProfile(userId);
+  
+    dispatch({
+      type: FETCH_HIDDEN_PINS,
+      photoUrls: response.data.hiddenPins,
+    });
+  
+    if (setAsFeed) {
+      dispatch({
+        type: SET_FEED,
+        photoUrls: response.data.hiddenPins,
       });
     }
   };
@@ -173,4 +190,29 @@ export const getFollowing = (userId) => async (dispatch) => {
     type: SET_FOLLOWING,
     following: response.data,
   });
+};
+// hide a pin
+export const hidePin = (pinId) => async (dispatch) => {
+  try {
+    await userService.hidePin(pinId);
+    dispatch({
+      type: HIDE_PIN,
+      pinId,
+    });
+  } catch (error) {
+    console.error('Failed to hide pin:', error);
+  }
+};
+
+// unhide pin
+export const unhidePin = (pinId) => async (dispatch) => {
+  try {
+    await userService.unhidePin(pinId);
+    dispatch({
+      type: UNHIDE_PIN,
+      pinId,
+    });
+  } catch (error) {
+    console.error('Failed to unhide pin:', error);
+  }
 };
