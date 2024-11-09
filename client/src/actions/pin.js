@@ -4,6 +4,7 @@ import * as userService from "../services/users";
 export const FETCH_SAVED_PINS = "FETCH_SAVED_PINS";
 export const FETCH_LIKED_PINS = "FETCH_LIKED_PINS";
 export const FETCH_HIDDEN_PINS = "FETCH_HIDDEN_PINS";
+
 export const SET_FEED = "SET_FEED";
 export const SET_CREATED_FEED = "SET_CREATED_FEED";
 export const SAVE_PIN = "SAVE_PIN";
@@ -19,9 +20,9 @@ export const SET_FOLLOWING = "SET_FOLLOWING";
 export const LIKE_COMMENT = "LIKE_COMMENT";
 export const DELETE_COMMENT = "DELETE_COMMENT";
 
-
 export const HIDE_PIN = 'HIDE_PIN';
 export const UNHIDE_PIN = 'UNHIDE_PIN';
+
 
 export const UPDATE_PASSWORD_SUCCESS = "UPDATE_PASSWORD_SUCCESS";
 export const UPDATE_PASSWORD_FAILURE = "UPDATE_PASSWORD_FAILURE";
@@ -59,6 +60,7 @@ export const getSavedPins =
       });
     }
   };
+
   export const getHiddenPins = ({ userId, setAsFeed }) => async (dispatch) => {
     const response = await userService.getProfile(userId);
   
@@ -75,7 +77,6 @@ export const getSavedPins =
     }
   };
   
-
 export const likePin = ({ userId, photoUrl }) => async (dispatch) => {
   try {
     await userService.likePin({ userId, photoUrl });
@@ -113,24 +114,35 @@ export const getRandomPins = () => async (dispatch) => {
   try {
     // Fetch random pins from MongoDB
     const response = await userService.getRandomPins();
-
     
-
-
-    console.log('Fetched Pins:', response.data); 
-
     const pins = response.data;
-
-    const photoUrls = response.data.map((pin) => pin.imageUrl);
 
     dispatch({
       type: SET_FEED,
-      //photoUrls: photoUrls,
       pins: pins,
     });
   } catch (error) {
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export const savePin =
   ({ userId, photoUrl }) =>
@@ -142,6 +154,7 @@ export const savePin =
     });
   };
 
+
 export const deleteSavedPin =
   ({ userId, photoUrl }) =>
     async (dispatch) => {
@@ -151,50 +164,6 @@ export const deleteSavedPin =
         photoUrl: photoUrl,
       });
     };
-
-      export const likeComment = (commentId, userId) => async (dispatch) => {
-        try {
-          const updatedComment = await userService.likeComment(commentId, userId);
-          dispatch({
-            type: LIKE_COMMENT,
-            comment: updatedComment, // Assuming the updated comment data is returned
-          });
-        } catch (error) {
-          console.error("Error liking comment:", error);
-        }
-      };
-      
-      
-      export const deleteComment = (commentId) => async (dispatch) => {
-        try {
-          await userService.deleteComment(commentId);
-          dispatch({
-            type: DELETE_COMMENT,
-            commentId,
-          });
-        } catch (error) {
-          console.error("Error deleting comment:", error);
-        }
-
-    };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // New action for creating a custom Pinterest pin
 export const createPin =
@@ -209,15 +178,14 @@ export const createPin =
           imageUrl
         });
 
-        // Dispatch the CREATE_CUSTOM_PIN action to update the state
         dispatch({
           type: CREATE_CUSTOM_PIN,
-          pin: response.data, // Assuming the API returns the created pin object
+          pin: response.data, 
         });
 
-        return response.data; // Return the created pin data for further use if needed
+        return response.data; 
       } catch (error) {
-        throw error; // Handle error if any
+        throw error; 
       }
     };
 
@@ -238,6 +206,33 @@ export const getFollowing = (userId) => async (dispatch) => {
     following: response.data,
   });
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const deleteComment = (commentId) => async (dispatch) => {
+  try {
+    await userService.deleteComment(commentId);
+    dispatch({
+      type: DELETE_COMMENT,
+      commentId,
+    });
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+  }
+};
+
+
 // hide a pin
 export const hidePin = (pinId) => async (dispatch) => {
   try {
@@ -263,6 +258,7 @@ export const unhidePin = (pinId) => async (dispatch) => {
     console.error('Failed to unhide pin:', error);
   }
 };
+
 // Change password
 export const updatePassword = ({ userId, currentPassword, newPassword }) => async (dispatch) => {
   try {
@@ -277,3 +273,4 @@ export const updatePassword = ({ userId, currentPassword, newPassword }) => asyn
   }
 };
 
+// Reset forgotten password
