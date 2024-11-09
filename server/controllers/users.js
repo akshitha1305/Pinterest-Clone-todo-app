@@ -525,6 +525,48 @@ usersRouter.get('/:userId/following', async (req, res) => {
   }
 });
 
+// Like or unlike a comment
+usersRouter.post("/pin/comment/:commentId/like", passport.authenticate("jwt", { session: false }), async (req, res) => {
+  const { commentId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    // Find the user document containing the pin with the specified comment
+    const user = await User.findOne({ "customPins.comments._id": commentId });
+    if (!user) return res.status(404).json({ error: "Comment not found" });
+
+    // Find the specific pin that contains the comment
+    const pin = user.customPins.find(pin => pin.comments.some(comment => comment._id.toString() === commentId));
+    if (!pin) return res.status(404).json({ error: "Pin not found" });
+
+    // Locate the specific comment
+    const comment = pin.comments.id(commentId);
+
+    // Check if the user has already liked this specific comment
+    const hasLiked = comment.likes ? comment.likes.includes(userId) : false;
+
+    if (hasLiked) {
+      // Unlike the comment if the user has already liked it
+      comment.likes = comment.likes.filter(id => id.toString() !== userId);
+    } else {
+      // Like the comment if the user has not liked it yet
+      comment.likes.push(userId);
+    }
+ // Save only the updated fields to prevent any uniqueness or constraint issues
+ await User.updateOne(
+  { "customPins._id": pin._id, "customPins.comments._id": commentId },
+  { $set: { "customPins.$[pin].comments.$[comment].likes": comment.likes } },
+  { arrayFilters: [{ "pin._id": pin._id }, { "comment._id": commentId }] }
+);
+
+// Send back the updated comment with the likes array
+res.status(200).json(comment);
+} catch (error) {
+console.error("Failed to like/unlike comment:", error);
+res.status(500).json({ error: "Failed to like/unlike comment", details: error.message });
+}
+});
+
 
 // Unified search endpoint to find users by username/name and pins by title
 usersRouter.get("/search/get-results", async (req, res) => {

@@ -5,6 +5,7 @@ export const FETCH_SAVED_PINS = "FETCH_SAVED_PINS";
 export const FETCH_LIKED_PINS = "FETCH_LIKED_PINS";
 export const FETCH_HIDDEN_PINS = "FETCH_HIDDEN_PINS";
 export const SET_FEED = "SET_FEED";
+export const SET_CREATED_FEED = "SET_CREATED_FEED";
 export const SAVE_PIN = "SAVE_PIN";
 export const LIKE_PIN = "LIKE_PIN";
 export const UNLIKE_PIN = "UNLIKE_PIN";
@@ -14,6 +15,10 @@ export const CREATE_CUSTOM_PIN = "CREATE_CUSTOM_PIN";
 // Action types
 export const SET_FOLLOWERS = "SET_FOLLOWERS";
 export const SET_FOLLOWING = "SET_FOLLOWING";
+
+export const LIKE_COMMENT = "LIKE_COMMENT";
+export const DELETE_COMMENT = "DELETE_COMMENT";
+
 
 export const HIDE_PIN = 'HIDE_PIN';
 export const UNHIDE_PIN = 'UNHIDE_PIN';
@@ -145,6 +150,32 @@ export const deleteSavedPin =
         type: DELETE_SAVED_PIN,
         photoUrl: photoUrl,
       });
+    };
+
+      export const likeComment = (commentId, userId) => async (dispatch) => {
+        try {
+          const updatedComment = await userService.likeComment(commentId, userId);
+          dispatch({
+            type: LIKE_COMMENT,
+            comment: updatedComment, // Assuming the updated comment data is returned
+          });
+        } catch (error) {
+          console.error("Error liking comment:", error);
+        }
+      };
+      
+      
+      export const deleteComment = (commentId) => async (dispatch) => {
+        try {
+          await userService.deleteComment(commentId);
+          dispatch({
+            type: DELETE_COMMENT,
+            commentId,
+          });
+        } catch (error) {
+          console.error("Error deleting comment:", error);
+        }
+
     };
 
 

@@ -112,6 +112,17 @@ export const getComments = async (pinId) => {
     throw error;
   }
 };
+// Delete a comment from a specific pin
+export const deleteComment = async (commentId) => {
+  return await instance.delete(`/pin/comment/${commentId}/deleted`);
+};
+
+// Like or unlike a comment
+export const likeComment = async (commentId, userId) => {
+  const response =  await instance.post(`/pin/comment/${commentId}/like`, { userId });
+  return response.data;
+};
+
  //Hide pin
 export const hidePin = async (pinId) => {
   const response = await instance.put(`/pin/hide/${pinId}`, { pinId });
