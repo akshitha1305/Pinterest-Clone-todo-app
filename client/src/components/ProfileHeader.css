@@ -49,6 +49,7 @@
     margin: 4px 0;
     align-items: center;
   }
+  
   .share-profile-button {
     background: none;
     border: none;
@@ -70,4 +71,28 @@
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 100;
+}
+
+.share-icons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.share-icon {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+}
+
+.share-icon i {
+  font-size: 20px;
+  margin-right: 5px;
+}
+
+.share-icon:hover {
+  color: #007bff;
 }
