@@ -64,45 +64,32 @@ const ProfileHeader = ({ user, followersCount, followingCount, onFollowersClick,
       console.error("Failed to follow/unfollow user:", error);
     }
   };
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(customMessage)
+      .then(() => alert("Profile link with message copied to clipboard"))
+      .catch((error) => console.error("Failed to copy link:", error));
+  };
 
+  const handleShareWhatsApp = () => {
+    const url = `https://wa.me/?text=${encodeURIComponent(customMessage)}`;
+    window.open(url, "_blank");
+  };
 
+  const handleShareMessenger = () => {
+    const url = `fb-messenger://share?link=${encodeURIComponent(profileUrl)}&quote=${encodeURIComponent(customMessage)}`;
+    window.open(url, "_blank");
+  };
 
+  const handleShareFacebook = () => {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(profileUrl)}&quote=${encodeURIComponent(customMessage)}`;
+    window.open(url, "_blank");
+  };
 
+  const handleShareTwitter = () => {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(customMessage)}`;
+    window.open(url, "_blank");
+  };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
   return (
     <div className="header__container">
       <div className="avatar__wrapper">
@@ -129,38 +116,34 @@ const ProfileHeader = ({ user, followersCount, followingCount, onFollowersClick,
         </FollowButton>
       </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      {/* Share Options Popup */}
+      {showShareOptions && (
+        <div className="share-options">
+          <h4>Share</h4>
+          <div className="share-icons">
+            <button onClick={handleCopyLink} className="share-icon">
+              <i className="fas fa-link"></i>
+              <span>Copy link</span>
+            </button>
+            <button onClick={handleShareWhatsApp} className="share-icon">
+              <i className="fab fa-whatsapp"></i>
+              <span>WhatsApp</span>
+            </button>
+            <button onClick={handleShareMessenger} className="share-icon">
+              <i className="fab fa-facebook-messenger"></i>
+              <span>Messenger</span>
+            </button>
+            <button onClick={handleShareFacebook} className="share-icon">
+              <i className="fab fa-facebook"></i>
+              <span>Facebook</span>
+            </button>
+            <button onClick={handleShareTwitter} className="share-icon">
+              <i className="fab fa-twitter"></i>
+              <span>X</span>
+            </button>
+          </div>
+        </div>
+      )}
       <hr></hr>
     </div>
   );
