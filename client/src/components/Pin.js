@@ -164,24 +164,7 @@ const Pin = ({ userId, auth_username, username, totalLikes, likers, pin_owner_id
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // Hide pin
+// Hide pin
   const handleHidePin = () => {
     if (window.confirm('Are you sure you want to hide this pin?')) {
       dispatch(hidePin(pin_id));

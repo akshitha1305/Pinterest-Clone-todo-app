@@ -1,5 +1,5 @@
 import "./ProfileHeader.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
 import ModalUnstyled from "@mui/core/ModalUnstyled";
 import { styled } from "@mui/system";
