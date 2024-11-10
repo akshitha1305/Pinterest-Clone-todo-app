@@ -1,17 +1,17 @@
 import React from "react";
-
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import FormLayout from "./components/FormLayout";
 import Login from "./pages/Login";
+import Forgot from "./pages/Forgot";
 import ResetPassword from "./pages/ResetPassword";
 import Home from "./pages/Home";
-import Forgot from "./pages/Forgot";
 import CreatePin from "./pages/CreatePin";
 import Profile from "./pages/Profile";
+import ProfileUser from "./pages/ProfileUser";
+import ChangePass from "./pages/ChangePass";
 import Signup from "./pages/Signup";
 import Search from "./pages/Search";
-import ChangePass from "./pages/ChangePass";
 import { RequireAuth, NotRequireAuth } from "./routes/routes";
 
 const App = () => {
@@ -29,16 +29,14 @@ const App = () => {
           />
           <Route
             path="/forgot"
-            element={
-                <Forgot />}
-            
+            element={<Forgot />}
           />
           <Route
             path="/reset-password"
             element={
               <ResetPassword />
             }
-            />
+          />
           <Route
             path="/signup"
             element={
@@ -73,6 +71,7 @@ const App = () => {
             </RequireAuth>
           }
         />
+          
         <Route
           path="/search/:query"
           element={
