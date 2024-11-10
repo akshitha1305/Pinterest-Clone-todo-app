@@ -62,8 +62,7 @@
     background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0 0);
   }
 
-  
-.masonry-grid {
+  .masonry-grid {
   display: flex;
   margin-left: -30px; /* Adjust for spacing */
   width: auto;
@@ -79,12 +78,75 @@
   margin-bottom: 30px;
 }
 
+.comment-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
 
+.comment-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
 
+.comment-header img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
 
+.comment-details {
+  display: flex;
+  flex-direction: column;
+}
 
+.username {
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+}
 
+.comment-text {
+  font-size: 14px;
+  color: #333;
+  margin: 5px 0;
+}
 
+.comment-actions {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #888;
+}
+
+.timestamp {
+  margin-right: 15px;
+}
+
+/* Like Button */
+.like-button {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 15px;
+}
+
+.like-button .fa-heart {
+  font-size: 16px;
+  margin-right: 5px;
+}
+
+.like-button .liked {
+  color: #e0245e; /* Red heart for liked */
+}
+
+.like-button .not-liked {
+  color: #ddd; /* White/gray heart for not liked */
+}
 
 /* Delete Button */
 .delete-button {
