@@ -149,21 +149,39 @@ const Pin = ({ userId, auth_username, username, totalLikes, likers, pin_owner_id
       window.alert("Failed to delete pin. Please try again."); // Show error message
     }
   };
+ 
+  // Delete pin comment
+  const handleDeleteComment = async (commentId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this comment?");
+    if (!confirmDelete) return;
 
+    try {
+      await deleteComment(commentId); // Call delete API
+      setComments(comments.filter(comment => comment._id !== commentId));
+      window.alert("Comment deleted successfully");
+      handleCloseDialog();
+    } catch (error) {
+      console.error("Failed to delete comment:", error);
+    }
+  };
 
+  // Like pin comment
+  const handleLikeComment = async (commentId) => {
+    try {
+      const updatedComment = await likeComment(commentId, userId); // Call like/unlike API
 
+      // Update the comments state with a new array reference
+      setComments(prevComments =>
+        prevComments.map(comment =>
+          comment._id === updatedComment._id ? updatedComment : comment
+        )
+      );
+    } catch (error) {
+      console.error("Failed to like/unlike comment:", error);
+    }
+  };
 
-
-
-
-
-
-
-
-
-
-
-
+  
 // Hide pin
   const handleHidePin = () => {
     if (window.confirm('Are you sure you want to hide this pin?')) {
