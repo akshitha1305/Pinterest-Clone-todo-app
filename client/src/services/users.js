@@ -11,7 +11,6 @@ export const signup = async (userData) => {
 
 export const login = async (userData) => {
   const response = await instance.post("/login", userData);
-  console.log('response is:', response);
   const { token, user } = response.data;
 
   localStorage.setItem('userId', response.data.userId);
@@ -21,6 +20,10 @@ export const login = async (userData) => {
 export const forgot = async (userData) => {
   return await instance.post("/forgot", userData);
 };
+
+// export const updateUserPassword = async (userId, currentPassword, newPassword) => {
+//   return await instance.put(`/update-password`, { userId, currentPassword, newPassword });
+// };
 
 // User profile and saved pins
 export const getProfile = async (userId) => {
