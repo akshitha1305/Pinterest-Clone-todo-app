@@ -75,16 +75,16 @@ const UserListItem = styled("li")`
   border-bottom: 1px solid #f0f0f0;
 `;
 
+const UserInfo = styled("div")`
+  display: flex;
+  align-items: center;
+`;
+
 const UserAvatar = styled("img")`
   border-radius: 50%;
   width: 40px;
   height: 40px;
   margin-right: 10px;
-`;
-
-const UserInfo = styled("div")`
-  display: flex;
-  align-items: center;
 `;
 
 const UserName = styled("span")`
@@ -142,28 +142,26 @@ const Profile = () => {
 
 
   useEffect(() => {
+    if (userId) {
     dispatch(getSavedPins({ userId, setAsFeed: true }));
     dispatch(getFollowers(userId)); // Fetch followers
     dispatch(getFollowing(userId)); // Fetch following
 
+      // Start loading created pins and set loading state
     setLoading(true);
       dispatch(getMyCreatedPins(userId)).then(() => setLoading(false));
-
-  }, [dispatch, userId]);
+    }
+  }, [dispatch, userId]); // Only re-run if dispatch or userId changes
   
-
+  // Update local following whenever following data changes
   useEffect(() => {
     // Update local state when following changes in Redux
     setLocalFollowing(following);
   }, [following]);
-
   // Function to handle unfollow
   const handleUnfollow = async (followedUserId) => {
-    try {
-      // Call the unfollow API
-      await unfollowUser(followedUserId);
-
-      // Update the local state to remove the unfollowed user from the UI
+    try {// Call the unfollow API
+      await unfollowUser(followedUserId);// Update the local state to remove the unfollowed user from the UI
       setLocalFollowing(localFollowing.filter(user => user.id !== followedUserId));
     } catch (error) {
       console.error('Failed to unfollow user:', error);
@@ -179,10 +177,32 @@ const Profile = () => {
         onFollowersClick={() => setFollowersModalOpen(true)}
         onFollowingClick={() => setFollowingModalOpen(true)}
       />
-      {saved.length
-        ? <PinGrid userId={userId} photoUrls={saved} savedPins={saved} />
-        : <h3>No pins saved yet</h3>
-      }
+      
+      <TabContainer>
+        <TabButton active={activeTab === "saved"} onClick={() => setActiveTab("saved")}>
+          Saved Pins
+        </TabButton>
+        <TabButton active={activeTab === "created"} onClick={() => setActiveTab("created")}>
+          Created Pins
+        </TabButton>
+      </TabContainer>
+
+      {activeTab === "saved" ? (
+        <div>
+          {saved.length ? <PinGridProfile userId={userId} photoUrls={saved} savedPins={saved} /> : <h3>No pins saved yet</h3>}
+        </div>
+      ) : (
+        <div>
+          {loading ? (
+            <p>Loading created pins...</p>
+          ) : createdPins && createdPins.length ? (
+            <PinGridCreated pins={createdPins} />
+          ) : (
+            <h3>No created pins yet</h3>
+          )}
+        </div>
+      )}
+      
        {/* Followers Modal */}
        <Dialog
         open={isFollowersModalOpen}
