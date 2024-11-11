@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
-/ Define a schema for comments
+// Define a schema for comments
 const commentSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Reference to user who made the comment
   username: String,
@@ -57,7 +57,7 @@ const userSchema = new mongoose.Schema({
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // List of users this user is following
 });
 
-/ Plugin for enforcing unique constraints on fields
+// Plugin for enforcing unique constraints on fields
 userSchema.plugin(uniqueValidator);
 
 // Transform JSON output to hide sensitive data

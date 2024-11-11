@@ -110,7 +110,7 @@ usersRouter.get("/user/:username", async (req, res) => {
     res.status(500).json({ message: "Error fetching user data", error: error.message });
   }
 });
-
+// Save pin
 usersRouter.put(
   "/:id/save-pin",
   passport.authenticate("jwt", { session: false }),
@@ -151,7 +151,7 @@ usersRouter.put(
   }
 );
 
-
+// delete Saved pin
 usersRouter.put(
   "/:id/delete-pin",
   passport.authenticate("jwt", { session: false }),
@@ -228,23 +228,54 @@ usersRouter.post(
     }
   }
 );
-
+// Get all pins created by different users
 usersRouter.get("/get/random-pins", async (request, response) => {
   try {
-    // Query MongoDB for custom pins in all users
+    // Fetch the current user's hidden pins array
+    const userId = request.user._id;
+    const user = await User.findById(userId).select("hiddenPins");
+
+    const hiddenPins = user?.hiddenPins || [];
     const randomPins = await User.aggregate([
       { $match: { customPins: { $exists: true, $not: { $size: 0 } } } }, // Only include users with customPins
       { $unwind: "$customPins" }, // Unwind the customPins array
+      {
+        $addFields: {
+          isHidden: { $in: ["$customPins._id", hiddenPins] }
+        }
+      },
+      
       { $sample: { size: 100 } }, // Get a random sample of 100 pins (adjust size as needed)
+      {
+        $lookup: {
+          from: "users",
+          let: { pinImageUrl: "$customPins.imageUrl" },
+          pipeline: [
+            { $match: { likedPins: { $exists: true, $type: "array" } } },
+            { $match: { $expr: { $in: ["$$pinImageUrl", "$likedPins"] } } },
+            { $project: { username: 1, name: 1, avatarUrl: 1 } }
+          ],
+          as: "likers"
+        }
+      },
+      {
+        $addFields: {
+          totalLikes: { $size: "$likers" }
+        }
+      },
       {
         $project: {
           _id: 0,
+          "customPins._id": 1,
           "customPins.title": 1,
           "customPins.imageUrl": 1,
           "customPins.createdAt": 1,
+          isHidden: 1,
           username: 1,
-          _id: 1,
-          name: 1 // Include username and name fields
+          pin_owner_id: "$_id",
+          name: 1,
+          likers: 1,
+          totalLikes: 1
         }
       }
     ]);
@@ -255,14 +286,18 @@ usersRouter.get("/get/random-pins", async (request, response) => {
 
     // Respond with the random pins, including username and name
     response.json(randomPins.map(pin => ({
+      pin_id: pin.customPins._id,
       title: pin.customPins.title,
       imageUrl: pin.customPins.imageUrl,
       createdAt: pin.customPins.createdAt,
       username: pin.username,
       pin_owner_id: pin._id,
-      name: pin.name
+      name: pin.name,
+      likers: pin.likers,
+        totalLikes: pin.totalLikes
     })));
   } catch (error) {
+    console.error("Error details:", error);
     response.status(500).json({ error: "A database error has occurred" });
   }
 });

@@ -124,23 +124,23 @@ export const getRandomPins = () => async (dispatch) => {
   } catch (error) {
   }
 };
+export const getMyCreatedPins = (userId) => async (dispatch) => {
+  try {
+    // Call the service function to fetch created pins
+   
+    const response = await userService.getMyCreatedPins({userId});
 
+    const pins = response.data;
+    console.log('my created pins in pin.js are:', pins);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    dispatch({
+      type: SET_CREATED_FEED,
+      pins: pins,
+    });
+  } catch (error) {
+    console.error("Error fetching created pins:", error);
+  }
+};
 
 
 

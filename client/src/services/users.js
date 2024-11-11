@@ -63,6 +63,24 @@ export const createPin = async ({ userId, title, imageUrl }) => {
 export const getRandomPins = async () => {
   return await instance.get("/get/random-pins"); // Assuming you have an endpoint like /api/random-pins
 };
+//Get my created pins
+export const getMyCreatedPins = async (userId) => {
+  const user = userId;
+  const pin_owner_id = user.userId;
+  //const pin_owner_id = localStorage.getItem('userId');
+
+  return await instance.get("/get/pins/user-pins", {
+    params: { pin_owner_id }
+  });
+}
+export const editPin = async (pinId, updatedData) => {
+  return await instance.put(`/pin/pin-edit/${pinId}`, updatedData);
+};
+
+export const deletePin = async (pinId) => {
+  return await instance.delete(`/pin/pin-delete/${pinId}`);
+};
+
 
 
 // Follow / Unfollow
