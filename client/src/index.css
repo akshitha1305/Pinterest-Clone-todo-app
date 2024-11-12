@@ -19,3 +19,61 @@
     text-decoration: none;
   }
   
+  body, html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Roboto", sans-serif;
+  }
+
+
+.checkboxclass {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.checkbox-label {
+  font-size: 18px;
+  color: #333;
+  flex-grow: 1;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.checkbox-label:hover {
+  color: #E60023;
+}
+
+.checked {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.delete-icon, .edit-icon {
+  color: #d9534f;
+  cursor: pointer;
+  font-size: 20px;
+  margin-left: 10px;
+  transition: color 0.2s;
+}
+
+.delete-icon:hover, .edit-icon:hover {
+  color: #c9302c;
+}
+
+.icon-tooltip {
+  position: relative;
+}
+
+.icon-tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  background-color: #333;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  top: -30px;
+  font-size: 12px;
+  white-space: nowrap;
+}
