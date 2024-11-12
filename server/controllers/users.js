@@ -8,13 +8,11 @@ const mongoose = require("mongoose");
 //signup route
 usersRouter.post("/signup", async (request, response) => {
   const body = request.body;
+  
 try {
-    // Log the incoming request body (make sure to not log passwords in production)
-    console.log("Signup attempt:", { username: body.username, name: body.name });
   const existingUser = await User.findOne({ username: body.username });
 
     if (existingUser) {
-      console.log("Username already exists:", body.username);
       return response
         .status(400)
         .json({ error: "The username has already been taken" });
@@ -28,6 +26,7 @@ try {
       name: body.name,
       passwordHash: passwordHash,
     });
+  
     const savedUser = await newUser.save();
     return response.json(savedUser);
   } catch (exception) {
@@ -64,20 +63,20 @@ usersRouter.post("/login", async (request, response) => {
   };
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 3600 });
-
-  // return response.status(200).send({ token: `Bearer ${token}` });
+  
   return response.status(200).send({
     token: `Bearer ${token}`, // Return the token with Bearer prefix
     userId: user._id // Return the user ID
+    username: user.username
   });
 });
+
 // Get user profile by ID
 usersRouter.get(
   "/:id",
   passport.authenticate("jwt", { session: false }),
   async (request, response) => {
     try {
-      console.log('Getting user data', request.params.id);
       const user = await User.findById(request.params.id);
       return response.json(user);
     } catch (exception) {
@@ -87,6 +86,7 @@ usersRouter.get(
     }
   }
 );
+
 // Get user by username - this is used to fetch details of another user
 usersRouter.get("/user/:username", async (req, res) => {
   const { username } = req.params;
@@ -110,6 +110,8 @@ usersRouter.get("/user/:username", async (req, res) => {
     res.status(500).json({ message: "Error fetching user data", error: error.message });
   }
 });
+
+
 // Save pin
 usersRouter.put(
   "/:id/save-pin",
@@ -127,8 +129,7 @@ usersRouter.put(
         .status(500)
         .json({ error: "A database error has occurred" });
     }
-  }
-  
+  } 
 );
 
 // Like pin
@@ -191,8 +192,6 @@ usersRouter.put(
   }
 );
 
-
-
 // New endpoint: Create a custom pin
 usersRouter.post(
   "/:id/create-pin",
@@ -228,6 +227,7 @@ usersRouter.post(
     }
   }
 );
+
 // Get all pins created by different users
 usersRouter.get("/get/random-pins", async (request, response) => {
   try {
@@ -280,80 +280,7 @@ usersRouter.get("/get/random-pins", async (request, response) => {
       }
     ]);
 
-    if (!randomPins || randomPins.length === 0) {
-      return response.status(404).json({ error: "No pins found" });
-    }
-
-    // Respond with the random pins, including username and name
-    response.json(randomPins.map(pin => ({
-      pin_id: pin.customPins._id,
-      title: pin.customPins.title,
-      imageUrl: pin.customPins.imageUrl,
-      createdAt: pin.customPins.createdAt,
-      username: pin.username,
-      pin_owner_id: pin._id,
-      name: pin.name,
-      likers: pin.likers,
-        totalLikes: pin.totalLikes
-    })));
-  } catch (error) {
-    console.error("Error details:", error);
-    response.status(500).json({ error: "A database error has occurred" });
-  }
-});
-// Get all pins created by different users
-usersRouter.get("/get/random-pins", passport.authenticate("jwt", { session: false }), async (request, response) => {
-  try {
-    // Fetch the current user's hidden pins array
-    const userId = request.user._id;
-    const user = await User.findById(userId).select("hiddenPins");
-
-    const hiddenPins = user?.hiddenPins || [];
-
-    const randomPins = await User.aggregate([
-      { $match: { customPins: { $exists: true, $not: { $size: 0 } } } },
-      { $unwind: "$customPins" },
-      {
-        $addFields: {
-          isHidden: { $in: ["$customPins._id", hiddenPins] }
-        }
-      },
-      { $sample: { size: 100 } },
-      {
-        $lookup: {
-          from: "users",
-          let: { pinImageUrl: "$customPins.imageUrl" },
-          pipeline: [
-            { $match: { likedPins: { $exists: true, $type: "array" } } },
-            { $match: { $expr: { $in: ["$$pinImageUrl", "$likedPins"] } } },
-            { $project: { username: 1, name: 1, avatarUrl: 1 } }
-          ],
-          as: "likers"
-        }
-      },
-      {
-        $addFields: {
-          totalLikes: { $size: "$likers" }
-        }
-      },
-      {
-        $project: {
-          _id: 0,
-          "customPins._id": 1,
-          "customPins.title": 1,
-          "customPins.imageUrl": 1,
-          "customPins.createdAt": 1,
-          isHidden: 1,
-          username: 1,
-          pin_owner_id: "$_id",
-          name: 1,
-          likers: 1,
-          totalLikes: 1
-        }
-      }
-    ]);
-
-
+    
     if (!randomPins || randomPins.length === 0) {
       return response.status(404).json({ error: "No pins found" });
     }
@@ -373,7 +300,7 @@ usersRouter.get("/get/random-pins", passport.authenticate("jwt", { session: fals
     );
   } catch (error) {
     console.error("Error details:", error);
-    response.status(500).json({ error: "A database error has occurred", details: error.message });
+    response.status(500).json({ error: "A database error has occurred" });
   }
 });
 
@@ -494,6 +421,7 @@ usersRouter.delete("/pin/pin-delete/:pinId", async (req, res) => {
     res.status(500).json({ error: "Failed to delete pin", details: error.message });
   }
 });
+
 // Route to follow a user
 usersRouter.post('/follow/user', async (req, res) => {
   const { userIdToFollow, loggedInUserId } = req.body; // userIdToFollow: user to follow, loggedInUserId: logged-in user
@@ -560,6 +488,93 @@ usersRouter.get('/:userId/following', async (req, res) => {
   }
 });
 
+// Add a comment to a specific pin
+usersRouter.post("/pin/add-comment", async (req, res) => {
+  const { pin_id, userId, auth_username, text } = req.body;
+
+  try {
+    // Create the new comment object
+    const newComment = {
+      userId,
+      username: auth_username,
+      text,
+      timestamp: new Date()
+    };
+
+    // Update the specific pin's comments array inside customPins
+    const result = await User.updateOne(
+      { "customPins._id": pin_id }, // Find the user with the specific pinId in customPins
+      { $push: { "customPins.$.comments": newComment } } // Push the new comment to the comments array of the found pin
+    );
+
+    if (result.nModified === 0) {
+      return res.status(404).json({ error: "Pin not found" });
+    }
+
+    res.status(201).json(newComment); // Send back the new comment
+  } catch (error) {
+    console.error("Failed to add comment:", error);
+    res.status(500).json({ error: "Failed to add comment", details: error.message });
+  }
+});
+
+// Endpoint to fetch comments for a specific pin
+usersRouter.get("/pin/:pinId/comments", async (req, res) => {
+  const { pinId } = req.params;
+
+  try {
+    // Find the user document containing the pin with the specified pinId in customPins
+    const user = await User.findOne({ "customPins._id": pinId });
+    if (!user) {
+      return res.status(404).json({ error: "Pin not found" });
+    }
+
+    // Find the specific pin in the user's customPins array
+    const pin = user.customPins.id(pinId);
+    if (!pin) {
+      return res.status(404).json({ error: "Pin not found in user's custom pins" });
+    }
+
+    // Sort the comments by timestamp in descending order
+    const sortedComments = pin.comments.sort((a, b) => b.timestamp - a.timestamp);
+
+    // Return the sorted comments for the specified pin
+    res.status(200).json(sortedComments);
+  } catch (error) {
+    console.error("Failed to fetch comments:", error);
+    res.status(500).json({ error: "Failed to fetch comments", details: error.message });
+  }
+});
+
+
+// Delete a comment on a pin
+usersRouter.delete("/pin/comment/:commentId/deleted", passport.authenticate("jwt", { session: false }), async (req, res) => {
+  const { commentId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const result = await User.updateOne(
+      {
+        "customPins.comments._id": commentId,
+        "customPins.comments.userId": userId
+      },
+      {
+        $pull: { "customPins.$[].comments": { _id: commentId } }
+      }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ error: "Comment not found or you're not authorized to delete this comment" });
+    }
+
+    res.status(200).json({ message: "Comment deleted successfully" });
+  } catch (error) {
+    console.error("Failed to delete comment:", error);
+    res.status(500).json({ error: "Failed to delete comment", details: error.message });
+  }
+});
+
+
 // Like or unlike a comment
 usersRouter.post("/pin/comment/:commentId/like", passport.authenticate("jwt", { session: false }), async (req, res) => {
   const { commentId } = req.params;
@@ -587,21 +602,21 @@ usersRouter.post("/pin/comment/:commentId/like", passport.authenticate("jwt", { 
       // Like the comment if the user has not liked it yet
       comment.likes.push(userId);
     }
+    
  // Save only the updated fields to prevent any uniqueness or constraint issues
  await User.updateOne(
-  { "customPins._id": pin._id, "customPins.comments._id": commentId },
-  { $set: { "customPins.$[pin].comments.$[comment].likes": comment.likes } },
-  { arrayFilters: [{ "pin._id": pin._id }, { "comment._id": commentId }] }
-);
+   { "customPins._id": pin._id, "customPins.comments._id": commentId },
+   { $set: { "customPins.$[pin].comments.$[comment].likes": comment.likes } },
+   { arrayFilters: [{ "pin._id": pin._id }, { "comment._id": commentId }] }
+ );
 
-// Send back the updated comment with the likes array
-res.status(200).json(comment);
-} catch (error) {
-console.error("Failed to like/unlike comment:", error);
-res.status(500).json({ error: "Failed to like/unlike comment", details: error.message });
-}
+  // Send back the updated comment with the likes array
+    res.status(200).json(comment);
+  } catch (error) {
+    console.error("Failed to like/unlike comment:", error);
+    res.status(500).json({ error: "Failed to like/unlike comment", details: error.message });
+  }
 });
-
 
 // Unified search endpoint to find users by username/name and pins by title
 usersRouter.get("/search/get-results", async (req, res) => {
@@ -666,7 +681,6 @@ usersRouter.get("/search/get-results", async (req, res) => {
     res.status(500).json({ error: "A database error has occurred", details: error.message });
   }
 });
-
 
 // Hide pin
 usersRouter.put("/pin/hide/:pinId", passport.authenticate('jwt', { session: false }), async (req, res) => {
@@ -775,6 +789,5 @@ usersRouter.post("/reset/password", async (req, res) => {
     res.status(200).json({ status: 200, error: "Invalid or expired token" });
   }
 });
-
 
 module.exports = usersRouter;
