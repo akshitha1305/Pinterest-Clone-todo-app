@@ -3,9 +3,31 @@ import "../index.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import TodoList from "../components/TodoList";
 
+
+
+
+
+
+
+
+
+const kookieQuotes = [
+  "Keep going!",
+  "Small progress is still progress.",
+  "You got this!",
+  "Stay committed!",
+  "Dream big, work hard!"
+];
+
+const tipOfTheDay = "Tip of the Day: Remember to prioritize your tasks!";
+
+
 function TodoPage(){
     const [todos, setTodos] = useState([]);
   const [inputValue, setInputValue] = useState("");
+  const [priority, setPriority] = useState("low");
+
+  const [kookieQuote, setKookieQuote] = useState("");
 
   useEffect(() => {
     const savedTodos = localStorage.getItem("todoList");
@@ -73,7 +95,14 @@ function TodoPage(){
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
         />
-       
+       <select
+          className="priority-select"
+          onChange={(e) => setPriority(e.target.value)}
+        >
+          <option value="low">Low Priority</option>
+          <option value="medium">Medium Priority</option>
+          <option value="high">High Priority</option>
+        </select>
 
         <button className="button-element" onClick={addTodo}>
           Add
@@ -94,6 +123,17 @@ function TodoPage(){
         </button>
     
       </div>
+      <div className="kookie-container">
+        <div className="kookie-quote">{kookieQuote}</div>
+        <img
+          src="https://i.pinimg.com/originals/8a/33/9d/8a339d01dab3b0b8ac0f900314c31232.gif"
+          alt="Kookie"
+          className="kookie-gif"
+        />
+      </div>
+      
+      
+      
 
 
     </div>
