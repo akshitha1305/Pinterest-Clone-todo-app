@@ -96,6 +96,14 @@ const App = () => {
             </RequireAuth>
           }
         />
+         <Route
+          path="/todo"
+          element={
+            <RequireAuth>
+              <TodoPage />
+            </RequireAuth>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
