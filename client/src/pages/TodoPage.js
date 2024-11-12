@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../index.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import TodoList from "../components/TodoList";
 
 function TodoPage(){
     const [todos, setTodos] = useState([]);
@@ -23,13 +24,34 @@ function TodoPage(){
     const newTodo = {
       id: Date.now(),
       text: inputValue,
-     
+      isChecked: false,
     };
     setTodos((prevTodos) => [...prevTodos, newTodo]);
     setInputValue("");
   };
 
+  const toggleTodo = (id) => {
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo.id === id ? { ...todo, isChecked: !todo.isChecked } : todo
+      )
+    );
+  };
 
+  const deleteTodo = (id) => {
+    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+  };
+
+  const editTodo = (id) => {
+    const newText = prompt("Edit your task:");
+    if (newText) {
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          todo.id === id ? { ...todo, text: newText } : todo
+        )
+      );
+    }
+  };
 
   const saveTodos = () => {
     localStorage.setItem("todoList", JSON.stringify(todos));
