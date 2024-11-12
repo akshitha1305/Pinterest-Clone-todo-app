@@ -27,6 +27,87 @@
   }
 
 
+.todos-heading {
+  font-size: 48px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #E60023, #FF4B2B);
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: 'Roboto', sans-serif;
+  letter-spacing: 2px;
+  text-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  animation: fadeIn 1.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.create-heading {
+  font-size: 28px;
+  color: #E60023;
+  margin-bottom: 10px;
+}
+
+.span-element {
+  color: #E60023;
+}
+
+.input-text {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+}
+
+.button-element {
+  width: 100%;
+  max-width: 150px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #E60023;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.button-element:hover {
+  background-color: #cc0020;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
 .checkboxclass {
   width: 20px;
   height: 20px;
