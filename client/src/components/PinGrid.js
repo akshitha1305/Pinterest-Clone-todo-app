@@ -1,35 +1,8 @@
+// PinGrid.js
 import React from "react";
 import Masonry from "react-masonry-css";
 import "./PinGrid.css";
 import Pin from "./Pin";
-
-//const PinGrid = ({ userId, photoUrls, savedPins = [] }) => {
-
-  //const breakpoints = { default: 4 };
-  //const baseWidth = 503;
-  //const increment = 252;
-  //for (let i = 0; i < 30; i++) {
-   // breakpoints[baseWidth + increment * i] = i + 1;
-  //}
-
-//   return (
-//     <div>
-//       {photoUrls.length > 0 && (
-//         <Masonry breakpointCols={breakpoints} className="masonry-grid">
-//           {photoUrls.map((photoUrl) => (
-//             <Pin
-//               key={photoUrl} // Use photoUrl as a unique key
-//               userId={userId}
-//               photoUrl={photoUrl}
-//           LikedsSaved={savedPins.includes(photoUrl)} // Check if the pin is saved
-//             />
-//           ))}
-//         </Masonry>
-//       )}
-//     </div>
-//   );
-// };
-
 
 const PinGrid = ({ userId, pins = [], savedPins = [], likedPins = [],  hiddenPins = [] }) => {
 
@@ -40,6 +13,7 @@ const PinGrid = ({ userId, pins = [], savedPins = [], likedPins = [],  hiddenPin
     600: 1
   };
   
+  const auth_username = localStorage.getItem("authusername");
 
   return (
     <div>
@@ -49,13 +23,12 @@ const PinGrid = ({ userId, pins = [], savedPins = [], likedPins = [],  hiddenPin
             <Pin
               key={pin.imageUrl}
               userId={userId}
-
+              auth_username={auth_username}
               photoUrl={pin.imageUrl}
-
-
+              pin_id={pin.pin_id}
               username={pin.username}
-
-
+              totalLikes={pin.totalLikes}
+              likers={pin.likers}
               pin_owner_id={pin.pin_owner_id}
               name={pin.name}
               title={pin.title}
