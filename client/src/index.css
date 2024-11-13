@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
+
 * {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans,
@@ -18,7 +20,8 @@
   a {
     text-decoration: none;
   }
-  
+
+
   body, html {
     margin: 0;
     padding: 0;
@@ -26,6 +29,17 @@
     font-family: "Roboto", sans-serif;
   }
 
+.bg-container {
+  background-image: url("https://i.pinimg.com/236x/8c/2e/ec/8c2eeca4f0e58a64afad6c3569ed4888.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
 
 .todos-heading {
   font-size: 48px;
@@ -54,6 +68,17 @@
   }
 }
 
+.container-fluid {
+  width: 100%;
+  max-width: 600px;
+  background-color: rgba(255, 255, 255, 0.8); /* White with 80% opacity */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
 .create-heading {
   font-size: 28px;
@@ -108,6 +133,10 @@
   animation: fadeIn 0.3s ease-in-out;
 }
 
+.todo-item:hover {
+  transform: scale(1.02);
+}
+
 .checkboxclass {
   width: 20px;
   height: 20px;
@@ -157,4 +186,57 @@
   top: -30px;
   font-size: 12px;
   white-space: nowrap;
+}
+
+.priority-select {
+  margin-bottom: 10px;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  width: 100%;
+}
+
+/* Light and Dark Theme Toggle */
+body.dark-mode {
+  background-color: #1a1a1a;
+  color: #f1f1f1;
+}
+
+body.dark-mode .bg-container {
+  background-image: url("https://marketplace.canva.com/EAFnAtfU8Yc/1/0/900w/canva-black-simple-minimalist-trendy-inspirational-quote-phone-wallpaper-z42rD5pX5NA.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+body.dark-mode .container-fluid {
+  background-color: rgba(42, 42, 42, 0.8);
+  border: 1px solid #444;
+}
+/* Floating Doraemon and Kookie Containers */
+.doraemon-container, .kookie-container {
+  position: fixed;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Increase GIF size and make background transparent */
+.doraemon-gif, .kookie-gif {
+  width: 100px;
+  height: auto;
+  border-radius: 50%;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+  background: transparent;
+}
+
+.doraemon-container {
+  right: 20px;
+}
+
+.kookie-container {
+  left: 20px;
 }
