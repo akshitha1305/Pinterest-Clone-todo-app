@@ -180,7 +180,6 @@ const Pin = ({ userId, auth_username, username, totalLikes, likers, pin_owner_id
       console.error("Failed to like/unlike comment:", error);
     }
   };
-
   
 // Hide pin
   const handleHidePin = () => {
@@ -281,32 +280,32 @@ const Pin = ({ userId, auth_username, username, totalLikes, likers, pin_owner_id
                 comments.map(comment => (
                   <CommentBox key={comment._id}>
                     <div className="comment-header">
-                      <img src='https://img.freepik.com/premium-vector/collection-hand-drawn-profile-icons_1323905-5.jpg?w=740' />
+                       <img src="https://img.freepik.com/premium-vector/collection-hand-drawn-profile-icons_1323905-5.jpg?w=740" alt="User avatar" />
+                       <div className="comment-details">
+                        <span className="username">{comment.username}</span>
+                        <span className="comment-text">{comment.text}</span>
+                        <div className="comment-actions">
+                          <span className="timestamp">{formatTimeAgo(comment.timestamp)}</span>
 
-                      <span className="username">{comment.username}</span>
+                          {/* Conditional Like Button */}
+                          <button
+                            className="like-button"
+                            onClick={() => handleLikeComment(comment._id)}
+                          >
+                            <i
+                              className={`fas fa-heart ${comment.likes && comment.likes.includes(userId) ? "liked" : "not-liked"}`}
+                            ></i>
+                            {comment.likes ? comment.likes.length : 0}
+                          </button>
 
-             
-                      <span className="timestamp">{formatTimeAgo(comment.timestamp)}</span>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                     </div>
-                    <div>
+                          {/* Delete Button */}
+                          {comment.userId === userId && (
+                            <button className="delete-button" onClick={() => handleDeleteComment(comment._id)}>
+                              <i className="fas fa-trash"></i>
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </CommentBox>
                 ))
