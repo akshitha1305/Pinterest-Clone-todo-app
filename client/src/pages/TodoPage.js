@@ -89,9 +89,9 @@ function TodoPage(){
     alert("Tasks saved!");
   };
 
-
-
-
+  const clearCompleted = () => {
+    setTodos(todos.filter((todo) => !todo.isChecked));
+  };
 
   const toggleTheme = () => {
     document.body.classList.toggle("dark-mode");
@@ -139,8 +139,8 @@ function TodoPage(){
         <button className="button-element" onClick={saveTodos}>
           Save
         </button>
-
-
+        <button className="button-element" onClick={clearCompleted}>
+          Clear Completed
         </button>
         <button className="button-element" onClick={toggleTheme}>
           Toggle Theme
@@ -165,16 +165,17 @@ function TodoPage(){
         />
       </div>
       
-      
-      
-
-
-
-
-
-            
+      <div className="tip-container">
+        <div className="tip-text">{tipOfTheDay}</div>
+        <img
+          src="https://c.tenor.com/38g1OB1hMQsAAAAC/bt21-chimmy.gif"
+          alt="Chimmy"
+          className="chimmy-gif"
+        />
+      </div>
     </div>
   );
 }
 
-export default TodoPage;
+export default TodoPage;           
+
