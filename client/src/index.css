@@ -240,3 +240,48 @@ body.dark-mode .container-fluid {
 .kookie-container {
   left: 20px;
 }
+
+/* Adjusted quote box styling */
+.doraemon-quote, .kookie-quote {
+  background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white */
+  color: #333;
+  padding: 10px 15px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 5px;
+  max-width: 200px;
+  line-height: 1.4;
+  font-weight: bold;
+}
+
+/* Tip of the Day Container */
+.tip-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 10px 15px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  max-width: 200px;
+}
+
+.tip-text {
+  font-size: 14px;
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.chimmy-gif {
+  width: 60px;
+  height: auto;
+  border-radius: 50%;
+}
