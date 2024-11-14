@@ -31,7 +31,7 @@ const ChangePass = () => {
     <>
       <NavBar />
       <div className="form-container"> {/* Centering container */}
-        <form onSubmit={handleSubmit(handleLogin)} className="change-pass-form">
+        <form onSubmit={handleSubmit(handlePasswordChange)} className="change-pass-form">
           <input
             type="password"
             placeholder="Enter your current password"

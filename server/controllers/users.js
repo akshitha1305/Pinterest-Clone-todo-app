@@ -66,7 +66,7 @@ usersRouter.post("/login", async (request, response) => {
   
   return response.status(200).send({
     token: `Bearer ${token}`, // Return the token with Bearer prefix
-    userId: user._id // Return the user ID
+    userId: user._id, // Return the user ID
     username: user.username
   });
 });
@@ -229,7 +229,7 @@ usersRouter.post(
 );
 
 // Get all pins created by different users
-usersRouter.get("/get/random-pins", async (request, response) => {
+usersRouter.get("/get/random-pins", passport.authenticate("jwt", { session: false }), async (request, response) => {
   try {
     // Fetch the current user's hidden pins array
     const userId = request.user._id;

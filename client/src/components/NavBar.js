@@ -243,7 +243,7 @@ const NavBar = ({ query }) => {
         <NavLink to="/" className={({ isActive }) => isActive ? "nav-bar__link--active" : "nav-bar__link--inactive"}>
           Home
         </NavLink>
-         <NavLink to="/profile" className={({ isActive }) => isActive ? "nav-bar__link--active" : "nav-bar__link--inactive"}>
+         <NavLink to="/pin/create" className={({ isActive }) => isActive ? "nav-bar__link--active" : "nav-bar__link--inactive"}>
           Create
         </NavLink>
         <NavLink to="/todo" className={({ isActive }) => isActive ? "nav-bar__link--active" : "nav-bar__link--inactive"} >

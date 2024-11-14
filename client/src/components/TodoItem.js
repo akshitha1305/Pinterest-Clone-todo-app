@@ -1,6 +1,6 @@
 import React from "react";
 
-function TodoItem({ todo, deleteTodo, editTodo }) {
+function TodoItem({ todo, toggleTodo, deleteTodo, editTodo }) {
   const priority = todo.priority || "low"; 
 
   return (

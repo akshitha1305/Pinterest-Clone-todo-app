@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import "../components/FormLayout.css";
 import { login } from "../actions/session";
 
-const LoginFormLayout = () => {
+const Forgot = () => {
   const {
     register,
     handleSubmit,
