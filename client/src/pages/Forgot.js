@@ -48,3 +48,6 @@ const ForgotPassword = () => {
     </form>
   );
 };
+
+export default ForgotPassword;
+
