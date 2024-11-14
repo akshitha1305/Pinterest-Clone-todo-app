@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../index.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+// npm install @fortawesome/fontawesome-free
 import TodoList from "../components/TodoList";
 
 const doraemonQuotes = [

@@ -1,5 +1,5 @@
 // ChangePass.js
-import React, { usestate} from "react";
+import React, { useState} from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { updatePassword } from "../actions/pin";

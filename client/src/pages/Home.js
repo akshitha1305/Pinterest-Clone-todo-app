@@ -13,7 +13,7 @@ const Home = () => {
   const user = useSelector((state) => state.session.user);
   const userId = user.id;
 
-  const { feed, saved, liked } = useSelector((state) => state.pin);
+  const { feed, saved, liked, hidden } = useSelector((state) => state.pin);
 
   useEffect(() => {
     dispatch(getSavedPins({ userId, setAsFeed: false }));

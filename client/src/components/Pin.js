@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { savePin, deleteSavedPin, likePin, unlikePin } from "../actions/pin";
-import { followUser, unfollowUser, checkIfFollowing, addComment, getComments, editPin, deletePin } from '../services/users';
+import { savePin, deleteSavedPin, likePin, unlikePin, hidePin, unhidePin } from "../actions/pin";
+import { followUser, unfollowUser, checkIfFollowing, addComment, getComments, editPin, deletePin, deleteComment, likeComment } from '../services/users';
 import {
   Dialog,
   Backdrop,
@@ -28,7 +28,7 @@ import {
 import "./Pin.css";
 import "../components/PinModal.css";
 
-const Pin = ({ userId, auth_username, username, totalLikes, likers, pin_owner_id, title, photoUrl, pin_id, isSaved, isLiked }) => {
+const Pin = ({ userId, auth_username, username, totalLikes, likers, pin_owner_id, title, photoUrl, pin_id, isSaved, isLiked, isHidden }) => {
   const dispatch = useDispatch();
   const [openDialog, setOpenDialog] = useState(false);
   const [showButton, setShowButton] = useState(false);
