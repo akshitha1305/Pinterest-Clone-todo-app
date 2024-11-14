@@ -8,7 +8,12 @@ router.get('/', (req, res) => {
   res.json(todos);
 });
 
-
+// Add a new todo
+router.post('/', (req, res) => {
+  const newTodo = { id: Date.now(), text: req.body.text, isChecked: false };
+  todos.push(newTodo);
+  res.json(newTodo);
+});
 
 
 // Toggle todo status
