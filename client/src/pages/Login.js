@@ -53,4 +53,4 @@ const LoginFormLayout = () => {
   );
 };
 
-export default LoginFormLayout;
+export default Forgot;
